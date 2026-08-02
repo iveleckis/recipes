@@ -4,5 +4,8 @@
   "packageManager": "pnpm@10.7.0",
   "scripts": {
     "dev:mobile": "pnpm --filter mobile start"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
   }
 }
