@@ -23,9 +23,6 @@ importers:
 
   apps/api:
     dependencies:
-      '@types/better-sqlite3':
-        specifier: ^9.6.0
-        version: 9.6.0
       better-sqlite3:
         specifier: ^13.0.3
         version: 13.0.3
@@ -33,6 +30,9 @@ importers:
         specifier: ^5.2.1
         version: 5.2.1
     devDependencies:
+      '@types/better-sqlite3':
+        specifier: ^9.6.0
+        version: 9.6.0
       '@types/express':
         specifier: ^5.0.6
         version: 5.0.6
