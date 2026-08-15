@@ -75,4 +75,40 @@ router.post("/", (req: Request, res: Response) => {
   }
 });
 
+router.put("/:id", (req: Request, res: Response) => {
+  const {
+    params: { id },
+    body,
+  } = req;
+  try {
+    const row = db
+      .prepare<
+        readonly [
+          Recipe["title"],
+          Recipe["description"],
+          Recipe["prep_time_seconds"],
+          Recipe["user_id"],
+          Recipe["id"],
+        ],
+        Recipe
+      >("UPDATE recipes SET title = ?, description = ?, prep_time_seconds = ? WHERE user_id = ? AND id = ? RETURNING *;")
+      .get([
+        body.title,
+        body.description,
+        body.prep_time_seconds,
+        MOCK_USER_ID,
+        Number(id),
+      ]);
+
+    if (!row) {
+      return res.status(404).send({ error: "Recipe not found." });
+    }
+
+    res.status(200).json(row);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong." });
+  }
+});
+
 export default router;
