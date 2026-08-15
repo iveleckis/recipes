@@ -1,5 +1,5 @@
 import express, { type Express, type Request, type Response } from "express";
-import { initDatabase } from "./database/index.ts";
+import { handleSeedData, initDatabase } from "./database/index.ts";
 
 const app: Express = express();
 
@@ -12,6 +12,7 @@ app.get("/", (req: Request, res: Response) => {
 async function main() {
   try {
     initDatabase();
+    handleSeedData();
     app.listen(3000);
   } catch (err) {
     console.error(err);
