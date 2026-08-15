@@ -32,6 +32,7 @@ function seedRecipe() {
     db.prepare<InsertRecipeArgs, void>(
       "INSERT INTO recipes(user_id, title, description, prep_time_seconds) VALUES (?, ?, ?, ?);",
     ).run([row.id, "Test Recipe", "Lorem ipsum sit", 600]);
+    console.log("recipe inserted");
   } catch (err) {
     console.error(err);
   }
