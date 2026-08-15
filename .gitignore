@@ -1,1 +1,6 @@
 node_modules
+
+# api
+/apps/api/data/*.db
+/apps/api/data/*.db-shm
+/apps/api/data/*.db-wal
