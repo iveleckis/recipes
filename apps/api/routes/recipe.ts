@@ -111,4 +111,28 @@ router.put("/:id", (req: Request, res: Response) => {
   }
 });
 
+router.delete("/:id", (req: Request, res: Response) => {
+  const {
+    params: { id },
+  } = req;
+
+  try {
+    const row = db
+      .prepare<
+        readonly [Recipe["user_id"], Recipe["id"]],
+        Pick<Recipe, "id">
+      >("DELETE FROM recipes WHERE user_id = ? AND id = ? RETURNING id;")
+      .get([MOCK_USER_ID, Number(id)]);
+
+    if (!row) {
+      return res.status(404).json({ error: "Recipe not found." });
+    }
+
+    res.status(200).json(row);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong." });
+  }
+});
+
 export default router;
