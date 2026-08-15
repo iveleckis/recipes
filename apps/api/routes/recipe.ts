@@ -17,4 +17,40 @@ router.get("/", (req: Request, res: Response) => {
   }
 });
 
+type Recipe = {
+  id: number;
+  user_id: number;
+  title: string;
+  description: string;
+  created_at: string;
+  prep_time_seconds: number;
+};
+
+router.post("/", (req: Request, res: Response) => {
+  const body = req.body;
+  try {
+    const result = db
+      .prepare<
+        readonly [
+          Recipe["user_id"],
+          Recipe["title"],
+          Recipe["description"],
+          Recipe["prep_time_seconds"],
+        ],
+        Recipe
+      >("INSERT INTO recipes(user_id, title, description, prep_time_seconds) VALUES(?, ?, ?, ?) RETURNING *;")
+      .get([
+        MOCK_USER_ID,
+        body.title,
+        body.description,
+        body.prep_time_seconds,
+      ]);
+
+    res.status(201).json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong." });
+  }
+});
+
 export default router;
