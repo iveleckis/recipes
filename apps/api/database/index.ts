@@ -38,7 +38,9 @@ function seedRecipe() {
   }
 }
 
-export function handleSeedData() {
+export function handleSeedData(skip = false) {
+  if (skip) return;
+
   const shouldSeedUser = !Boolean(db.prepare("select * from users;").get());
 
   if (shouldSeedUser) {
