@@ -1,18 +1,10 @@
 import { Router, type Request, type Response } from "express";
+import { type Recipe } from "@recipes/contracts";
 import db from "../database/index.ts";
 
 const router = Router();
 
 const MOCK_USER_ID = 1;
-
-type Recipe = {
-  id: number;
-  user_id: number;
-  title: string;
-  description: string;
-  created_at: string;
-  prep_time_seconds: number;
-};
 
 router.get("/", (req: Request, res: Response) => {
   try {

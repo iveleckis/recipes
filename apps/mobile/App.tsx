@@ -1,15 +1,6 @@
-import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-
-type Recipe = {
-  id: number;
-  user_id: number;
-  title: string;
-  description: string;
-  created_at: string;
-  prep_time_seconds: number;
-};
+import { type Recipe } from "@recipes/contracts";
 
 export default function App() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -30,11 +21,11 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text>wow</Text>
       <View>
         {recipes.map((recipe) => (
           <Text key={recipe.id}>{recipe.title}</Text>
         ))}
+        {recipes.length === 0 && <Text>No recipes found</Text>}
       </View>
     </View>
   );
