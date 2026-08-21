@@ -15,15 +15,15 @@ const tokens = {
     ink40: "rgba(35,32,28,.40)",
     ink35: "rgba(35,32,28,.35)",
 
-    paper: "#FFFCF4", // recipe cards
-    pageWarm: "#FBF7EC", // list / search screens
-    pageTan: "#EDE6D6", // tonight / detail screens
+    paper: "#FFFCF4",
+    pageWarm: "#FBF7EC",
+    pageTan: "#EDE6D6",
 
-    redPen: "#C2503F", // Ellie, ratings, accents
-    bluePen: "#33587F", // Marco, links
+    redPen: "#C2503F",
+    bluePen: "#33587F",
 
-    rule: "rgba(120,150,180,.26)", // ruled-paper lines
-    hairline: "rgba(35,32,28,.14)", // card borders
+    rule: "rgba(120,150,180,.26)",
+    hairline: "rgba(35,32,28,.14)",
     hairlineSoft: "rgba(35,32,28,.08)",
   },
 
@@ -41,7 +41,6 @@ const tokens = {
     body: "400 15px/1.5 Karla",
     bodyStrong: "500 17px/1.25 Karla",
     meta: "400 12.5px Karla",
-    eyebrow: "500 10.5px Karla", // pair with tracking.wide + uppercase
   },
 
   tracking: { wide: ".16em", wider: ".2em" },
@@ -59,11 +58,6 @@ const tokens = {
 
   device: { width: 402, height: 874, tabBar: 78 },
 };
-
-// Ruled-paper fill, e.g. background: ruled(25)
-export const ruled = (lineHeight = 25) =>
-  `repeating-linear-gradient(180deg,transparent,transparent ${lineHeight}px,` +
-  `rgba(120,150,180,.18) ${lineHeight}px,rgba(120,150,180,.18) ${lineHeight + 1}px)`;
 
 export default function App() {
   const [query, setQuery] = useState("");
