@@ -69,9 +69,26 @@ export default function RecipeDetailsScreen({
           padding: 16,
         }}
       >
-        <View style={{ paddingBottom: 16 }}>
+        <View
+          style={{
+            paddingBottom: 16,
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
           <Pressable onPress={() => navigation.navigate("RecipeList")}>
             <Text style={{ color: tokens.color.ink45 }}>back</Text>
+          </Pressable>
+          <Pressable
+            onPress={() =>
+              navigation.navigate("UpdateRecipe", {
+                id: recipe.id,
+                time: recipe.prep_time_seconds,
+                title: recipe.title,
+              })
+            }
+          >
+            <Text style={{ color: tokens.color.bluePen }}>edit</Text>
           </Pressable>
         </View>
         <View

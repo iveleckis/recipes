@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import RecipeListScreen from "./screens/recipes-list";
 import RecipeDetailsScreen from "./screens/recipe-details";
 import CreateRecipeScreen from "./screens/create-recipe";
+import UpdateRecipeScreen from "./screens/update-recipe";
 
 const RootStack = createNativeStackNavigator({
   initialRouteName: "RecipeList",
@@ -13,16 +14,15 @@ const RootStack = createNativeStackNavigator({
   screens: {
     RecipeList: {
       screen: RecipeListScreen,
-      headerStyle: {
-        height: 0,
-        display: "none",
-      },
     },
     RecipeDetails: {
       screen: RecipeDetailsScreen,
     },
     CreateRecipe: {
       screen: CreateRecipeScreen,
+    },
+    UpdateRecipe: {
+      screen: UpdateRecipeScreen,
     },
   },
 });
