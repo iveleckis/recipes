@@ -24,6 +24,10 @@ export default function RecipeListScreen() {
     });
   };
 
+  const handleCreateRecipe = () => {
+    navigation.navigate("CreateRecipe");
+  };
+
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
@@ -83,7 +87,7 @@ export default function RecipeListScreen() {
             <Text>No recipes found...</Text>
           )}
           <View style={[styles.paddingX, { paddingTop: 24 }]}>
-            <Pressable>
+            <Pressable onPress={handleCreateRecipe}>
               <View
                 style={{
                   borderStyle: "dashed",

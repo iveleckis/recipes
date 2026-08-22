@@ -3,6 +3,7 @@ import { createStaticNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import RecipeListScreen from "./screens/recipes-list";
 import RecipeDetailsScreen from "./screens/recipe-details";
+import CreateRecipeScreen from "./screens/create-recipe";
 
 const RootStack = createNativeStackNavigator({
   initialRouteName: "RecipeList",
@@ -19,6 +20,9 @@ const RootStack = createNativeStackNavigator({
     },
     RecipeDetails: {
       screen: RecipeDetailsScreen,
+    },
+    CreateRecipe: {
+      screen: CreateRecipeScreen,
     },
   },
 });
