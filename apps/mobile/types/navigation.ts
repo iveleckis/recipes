@@ -4,4 +4,9 @@ export type RootStackParamList = {
     id: number;
   };
   CreateRecipe: undefined;
+  UpdateRecipe: {
+    id: number;
+    title: string;
+    time: number;
+  };
 };
