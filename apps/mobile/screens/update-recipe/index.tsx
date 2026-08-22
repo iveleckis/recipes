@@ -124,6 +124,24 @@ export default function UpdateRecipeScreen({
     }
   };
 
+  const handleDeleteRecipe = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/recipes/${route.params.id}`,
+        {
+          method: "DELETE",
+        },
+      );
+      const data = await res.json();
+      if (!data) {
+        return;
+      }
+      navigation.navigate("RecipeList");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <SafeAreaView>
       <View
@@ -207,6 +225,28 @@ export default function UpdateRecipeScreen({
             <Text>Methods</Text>
             <WritingBookTextArea />
           </View>
+        </View>
+
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <Pressable onPress={handleDeleteRecipe}>
+            <Text
+              style={{
+                opacity: 0.75,
+                color: tokens.color.redPen,
+                fontSize: 18,
+                width: "100%",
+                padding: 24,
+              }}
+            >
+              delete this recipe
+            </Text>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>
