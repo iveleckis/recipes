@@ -82,6 +82,30 @@ export default function RecipeListScreen() {
           ) : (
             <Text>No recipes found...</Text>
           )}
+          <View style={[styles.paddingX, { paddingTop: 24 }]}>
+            <Pressable>
+              <View
+                style={{
+                  borderStyle: "dashed",
+                  borderWidth: 1,
+                  paddingVertical: 20,
+                  width: "100%",
+                  borderColor: tokens.color.ink55,
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "PlaywriteIN",
+                    fontSize: 18,
+                    color: tokens.color.ink55,
+                    textAlign: "center",
+                  }}
+                >
+                  + Write a recipe
+                </Text>
+              </View>
+            </Pressable>
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -104,10 +128,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   searchBar: {
+    padding: 0,
     borderBottomColor: tokens.color.ink,
     borderBottomWidth: 1,
     color: tokens.color.ink72,
     marginBottom: 24,
+    paddingVertical: 10,
+    includeFontPadding: false, // Android font metric space above/below glyphs
+    textAlignVertical: "center", // Android only, no-op on iOS
   },
   recipeItem: {
     borderBottomColor: tokens.color.hairline,
