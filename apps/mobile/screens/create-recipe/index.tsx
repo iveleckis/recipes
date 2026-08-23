@@ -77,22 +77,13 @@ function WritingBookTextArea() {
   );
 }
 
-type CreateRecipeForm = {
-  title: string;
-  time: number;
-  description: string;
-};
-
-export default function CreateRecipeScreen() {
+function useCreateRecipe() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>("");
 
-  const [formValues, setFormValues] = useState<CreateRecipeForm>({
-    title: "",
-    time: 0,
-    description: "",
-  });
-
-  const handleCreateRecipe = async () => {
+  const handleCreateRecipe = async (values: CreateRecipeDto) => {
+    setIsLoading(true);
     try {
       const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/recipes`, {
         method: "POST",
@@ -100,9 +91,9 @@ export default function CreateRecipeScreen() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: formValues.title,
+          title: values.title,
           description: "",
-          prep_time_seconds: formValues.time,
+          prep_time_seconds: values.time,
         }),
       });
       const data = await res.json();
@@ -111,9 +102,36 @@ export default function CreateRecipeScreen() {
       }
       navigation.navigate("RecipeDetails", { id: data.id });
     } catch (err) {
-      console.error(err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  return {
+    createRecipe: handleCreateRecipe,
+    isLoading,
+    error,
+  };
+}
+
+type CreateRecipeDto = {
+  title: string;
+  time: number;
+  description: string;
+};
+
+export default function CreateRecipeScreen() {
+  const { createRecipe, isLoading, error } = useCreateRecipe();
+  const [formValues, setFormValues] = useState<CreateRecipeDto>({
+    title: "",
+    time: 0,
+    description: "",
+  });
 
   return (
     <SafeAreaView>
@@ -135,69 +153,75 @@ export default function CreateRecipeScreen() {
             <Text style={{ color: tokens.color.ink45 }}>cancel</Text>
           </Pressable>
           <Text style={{ color: tokens.color.ink35 }}>new recipe</Text>
-          <Pressable onPress={handleCreateRecipe}>
+          <Pressable onPress={() => createRecipe(formValues)}>
             <Text style={{ color: tokens.color.redPen }}>save</Text>
           </Pressable>
         </View>
 
-        <View style={{ gap: 16 }}>
-          <Text>Name it</Text>
-          <TextInput
-            value={formValues.title}
-            onChangeText={(value) =>
-              setFormValues((prev) => ({ ...prev, title: value }))
-            }
-            placeholder="Sunday Ragu..."
-            style={{
-              borderBottomColor: tokens.color.hairline,
-              borderBottomWidth: 1,
-            }}
-          />
+        {isLoading ? (
+          <Text>Loading...</Text>
+        ) : error ? (
+          <Text>{error}</Text>
+        ) : (
+          <View style={{ gap: 16 }}>
+            <Text>Name it</Text>
+            <TextInput
+              value={formValues.title}
+              onChangeText={(value) =>
+                setFormValues((prev) => ({ ...prev, title: value }))
+              }
+              placeholder="Sunday Ragu..."
+              style={{
+                borderBottomColor: tokens.color.hairline,
+                borderBottomWidth: 1,
+              }}
+            />
 
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              width: "100%",
-              gap: 8,
-            }}
-          >
-            <View style={{ flex: 1 }}>
-              <Text>Time</Text>
-              <TextInput
-                value={formValues.time ? String(formValues.time) : ""}
-                onChangeText={(value) =>
-                  setFormValues((prev) => ({ ...prev, time: Number(value) }))
-                }
-                placeholder="35 mins"
-                style={{
-                  borderBottomColor: tokens.color.ink40,
-                  borderBottomWidth: 1,
-                }}
-              />
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                width: "100%",
+                gap: 8,
+              }}
+            >
+              <View style={{ flex: 1 }}>
+                <Text>Time</Text>
+                <TextInput
+                  value={formValues.time ? String(formValues.time) : ""}
+                  onChangeText={(value) =>
+                    setFormValues((prev) => ({ ...prev, time: Number(value) }))
+                  }
+                  placeholder="35 mins"
+                  style={{
+                    borderBottomColor: tokens.color.ink40,
+                    borderBottomWidth: 1,
+                  }}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text>Serves</Text>
+                <TextInput
+                  placeholder="serves 2"
+                  style={{
+                    borderBottomColor: tokens.color.ink40,
+                    borderBottomWidth: 1,
+                  }}
+                />
+              </View>
             </View>
-            <View style={{ flex: 1 }}>
-              <Text>Serves</Text>
-              <TextInput
-                placeholder="serves 2"
-                style={{
-                  borderBottomColor: tokens.color.ink40,
-                  borderBottomWidth: 1,
-                }}
-              />
+
+            <View>
+              <Text>Ingredients</Text>
+              <WritingBookTextArea />
+            </View>
+
+            <View>
+              <Text>Methods</Text>
+              <WritingBookTextArea />
             </View>
           </View>
-
-          <View>
-            <Text>Ingredients</Text>
-            <WritingBookTextArea />
-          </View>
-
-          <View>
-            <Text>Methods</Text>
-            <WritingBookTextArea />
-          </View>
-        </View>
+        )}
       </View>
     </SafeAreaView>
   );
