@@ -29,18 +29,17 @@ const MOCK_STEPS = [
   "Add garlic to taste",
 ];
 
-export default function RecipeDetailsScreen({
-  route,
-}: StaticScreenProps<{ id: number }>) {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+function useFetchRecipe(id: number) {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
-  const [checkedIngredients, setCheckedIngredients] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>("");
 
   useEffect(() => {
     const fetchRecipeDetails = async () => {
+      setIsLoading(true);
       try {
         const res = await fetch(
-          `${process.env.EXPO_PUBLIC_API_URL}/recipes/${route.params.id}`,
+          `${process.env.EXPO_PUBLIC_API_URL}/recipes/${id}`,
         );
         const data = await res.json();
         if (!data) {
@@ -48,13 +47,37 @@ export default function RecipeDetailsScreen({
         }
         setRecipe(data);
       } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Something went wrong.");
+        }
+      } finally {
         navigation.navigate("RecipeList");
-        console.error(err);
+        setIsLoading(false);
       }
     };
 
     fetchRecipeDetails();
-  }, [route]);
+  }, [id]);
+
+  return {
+    recipe,
+    isLoading,
+    error,
+  };
+}
+
+export default function RecipeDetailsScreen({
+  route,
+}: StaticScreenProps<{ id: number }>) {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const {
+    recipe,
+    isLoading,
+    error: recipeError,
+  } = useFetchRecipe(route.params.id);
+  const [checkedIngredients, setCheckedIngredients] = useState<string[]>([]);
 
   if (recipe === null) {
     return null;
@@ -91,109 +114,119 @@ export default function RecipeDetailsScreen({
             <Text style={{ color: tokens.color.bluePen }}>edit</Text>
           </Pressable>
         </View>
-        <View
-          style={{
-            borderColor: tokens.color.hairline,
-            borderWidth: 1,
-            backgroundColor: tokens.color.paper,
-            elevation: 4,
-            padding: 16,
-          }}
-        >
-          <Text style={{ fontSize: 24 }}>{recipe.title}</Text>
-          <Text
-            style={{
-              color: tokens.color.ink35,
-              paddingTop: 8,
-              paddingBottom: 8,
-            }}
-          >
-            {recipe.prep_time_seconds / 60} mins
-          </Text>
+        {isLoading ? (
+          <Text>Loading...</Text>
+        ) : recipeError ? (
+          <Text>Error</Text>
+        ) : (
           <View
             style={{
-              borderBottomWidth: 1,
-              borderBottomColor: tokens.color.hairlineSoft,
-            }}
-          />
-
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingTop: 12,
-              paddingBottom: 12,
+              borderColor: tokens.color.hairline,
+              borderWidth: 1,
+              backgroundColor: tokens.color.paper,
+              elevation: 4,
+              padding: 16,
             }}
           >
+            <Text style={{ fontSize: 24 }}>{recipe.title}</Text>
             <Text
               style={{
-                color: tokens.color.ink45,
+                color: tokens.color.ink35,
+                paddingTop: 8,
+                paddingBottom: 8,
               }}
             >
-              Ingredients
+              {recipe.prep_time_seconds / 60} mins
             </Text>
-            {MOCK_INGREDIENTS.length !== checkedIngredients.length && (
-              <Pressable
-                onPress={() => setCheckedIngredients(MOCK_INGREDIENTS)}
-              >
-                <Text style={{ color: tokens.color.bluePen }}>add all</Text>
-              </Pressable>
-            )}
-          </View>
-
-          {MOCK_INGREDIENTS.map((ingredient) => (
             <View
-              key={ingredient}
               style={{
                 borderBottomWidth: 1,
-                borderBottomColor: tokens.color.hairline,
+                borderBottomColor: tokens.color.hairlineSoft,
+              }}
+            />
+
+            <View
+              style={{
                 display: "flex",
                 flexDirection: "row",
-                gap: 8,
-                paddingBottom: 4,
-                paddingTop: 4,
+                justifyContent: "space-between",
+                paddingTop: 12,
+                paddingBottom: 12,
               }}
             >
-              <Checkbox
-                value={checkedIngredients.includes(ingredient)}
-                onValueChange={() =>
-                  setCheckedIngredients((prev) =>
-                    prev.includes(ingredient)
-                      ? prev.filter((ing) => ing !== ingredient)
-                      : [...prev, ingredient],
-                  )
-                }
-              />
-              <Text>{ingredient}</Text>
-            </View>
-          ))}
-
-          <View
-            style={{
-              paddingTop: 20,
-              borderBottomWidth: 1,
-              borderBottomColor: tokens.color.hairlineSoft,
-            }}
-          />
-
-          <Text style={{ color: tokens.color.ink45, paddingTop: 12 }}>
-            Method
-          </Text>
-          {MOCK_STEPS.map((step, index) => (
-            <View
-              key={step}
-              style={{ flexDirection: "row", alignItems: "center" }}
-            >
               <Text
-                style={{ padding: 8, color: tokens.color.redPen, fontSize: 20 }}
+                style={{
+                  color: tokens.color.ink45,
+                }}
               >
-                {index + 1}
+                Ingredients
               </Text>
-              <Text>{step}</Text>
+              {MOCK_INGREDIENTS.length !== checkedIngredients.length && (
+                <Pressable
+                  onPress={() => setCheckedIngredients(MOCK_INGREDIENTS)}
+                >
+                  <Text style={{ color: tokens.color.bluePen }}>add all</Text>
+                </Pressable>
+              )}
             </View>
-          ))}
-        </View>
+
+            {MOCK_INGREDIENTS.map((ingredient) => (
+              <View
+                key={ingredient}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: tokens.color.hairline,
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 8,
+                  paddingBottom: 4,
+                  paddingTop: 4,
+                }}
+              >
+                <Checkbox
+                  value={checkedIngredients.includes(ingredient)}
+                  onValueChange={() =>
+                    setCheckedIngredients((prev) =>
+                      prev.includes(ingredient)
+                        ? prev.filter((ing) => ing !== ingredient)
+                        : [...prev, ingredient],
+                    )
+                  }
+                />
+                <Text>{ingredient}</Text>
+              </View>
+            ))}
+
+            <View
+              style={{
+                paddingTop: 20,
+                borderBottomWidth: 1,
+                borderBottomColor: tokens.color.hairlineSoft,
+              }}
+            />
+
+            <Text style={{ color: tokens.color.ink45, paddingTop: 12 }}>
+              Method
+            </Text>
+            {MOCK_STEPS.map((step, index) => (
+              <View
+                key={step}
+                style={{ flexDirection: "row", alignItems: "center" }}
+              >
+                <Text
+                  style={{
+                    padding: 8,
+                    color: tokens.color.redPen,
+                    fontSize: 20,
+                  }}
+                >
+                  {index + 1}
+                </Text>
+                <Text>{step}</Text>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
