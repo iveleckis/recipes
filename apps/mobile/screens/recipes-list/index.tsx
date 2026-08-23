@@ -1,18 +1,100 @@
 import { useEffect, useState } from "react";
 import { View, Text, TextInput, StyleSheet, Pressable } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
-import { type Recipe } from "@recipes/contracts";
 import { useFonts } from "expo-font";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { type NavigationProp, useNavigation } from "@react-navigation/native";
+import { type Recipe } from "@recipes/contracts";
 import { RootStackParamList } from "../../types/navigation";
 import { tokens } from "../../constants/tokens";
 
-export default function RecipeListScreen() {
-  const [query, setQuery] = useState("");
+function useFetchRecipes() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>("");
 
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/recipes`);
+        const data = await res.json();
+        setRecipes(data);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Something went wrong.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRecipes();
+  }, []);
+
+  return {
+    recipes,
+    isLoading,
+    error,
+  };
+}
+
+type RecipesListErrorProps = {
+  onRetry: () => void;
+};
+
+function RecipesListError({ onRetry }: RecipesListErrorProps) {
+  return (
+    <View style={{ paddingHorizontal: 24, gap: 16, paddingVertical: 40 }}>
+      <Text
+        style={{
+          fontFamily: "PlaywriteIN",
+          fontSize: 20,
+          textAlign: "center",
+        }}
+      >
+        The box didn’t open
+      </Text>
+      <Text
+        style={{
+          fontFamily: "PlaywriteIN",
+          textAlign: "center",
+          color: tokens.color.ink55,
+        }}
+      >
+        Nothing’s lost — we just couldn’t fetch the list right now.
+      </Text>
+      <Pressable
+        onPress={onRetry}
+        style={{
+          backgroundColor: tokens.color.ink,
+          padding: 8,
+          marginHorizontal: 36,
+        }}
+      >
+        <Text
+          style={{
+            textAlign: "center",
+            fontFamily: "PlaywriteIN",
+            fontSize: 18,
+            color: tokens.color.paper,
+          }}
+        >
+          Try again
+        </Text>
+      </Pressable>
+    </View>
+  );
+}
+
+export default function RecipeListScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  const { recipes, isLoading, error: recipeError } = useFetchRecipes();
+
+  const [query, setQuery] = useState("");
 
   const filteredRecipes = recipes.filter((recipe) =>
     recipe.title.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
@@ -27,20 +109,6 @@ export default function RecipeListScreen() {
   const handleCreateRecipe = () => {
     navigation.navigate("CreateRecipe");
   };
-
-  useEffect(() => {
-    const fetchRecipes = async () => {
-      try {
-        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/recipes`);
-        const data = await res.json();
-        setRecipes(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchRecipes();
-  }, []);
 
   const [loaded, error] = useFonts({
     PlaywriteIN: require("../../assets/fonts/PlaywriteIN-VariableFont_wght.ttf"),
@@ -69,22 +137,30 @@ export default function RecipeListScreen() {
           />
         </View>
         <View>
-          {filteredRecipes.length > 0 ? (
-            filteredRecipes.map((recipe) => (
-              <Pressable
-                key={recipe.id}
-                onPress={() => handleNavigate(recipe.id)}
-              >
-                <View style={styles.recipeItem}>
-                  <Text style={styles.recipeItemTitle} key={recipe.id}>
-                    {recipe.title}
-                  </Text>
-                  <Text>{recipe.prep_time_seconds / 60} mins</Text>
-                </View>
-              </Pressable>
-            ))
+          {isLoading ? (
+            <Text>Loading...</Text>
+          ) : recipeError ? (
+            <RecipesListError onRetry={console.log} />
           ) : (
-            <Text>No recipes found...</Text>
+            <View>
+              {filteredRecipes.length > 0 ? (
+                filteredRecipes.map((recipe) => (
+                  <Pressable
+                    key={recipe.id}
+                    onPress={() => handleNavigate(recipe.id)}
+                  >
+                    <View style={styles.recipeItem}>
+                      <Text style={styles.recipeItemTitle} key={recipe.id}>
+                        {recipe.title}
+                      </Text>
+                      <Text>{recipe.prep_time_seconds / 60} mins</Text>
+                    </View>
+                  </Pressable>
+                ))
+              ) : (
+                <Text>No recipes found...</Text>
+              )}
+            </View>
           )}
           <View style={[styles.paddingX, { paddingTop: 24 }]}>
             <Pressable onPress={handleCreateRecipe}>

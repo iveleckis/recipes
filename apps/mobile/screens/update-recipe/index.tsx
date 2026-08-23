@@ -81,7 +81,91 @@ function WritingBookTextArea() {
   );
 }
 
-type UpdateRecipeForm = {
+function useUpdateRecipe(id: number) {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>("");
+
+  const handleUpdateRecipe = async (values: UpdateRecipeDto) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/recipes/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: values.title,
+            description: "",
+            prep_time_seconds: values.time,
+          }),
+        },
+      );
+      const data = await res.json();
+      if (!data) {
+        return;
+      }
+      navigation.navigate("RecipeDetails", { id: data.id });
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    updateRecipe: handleUpdateRecipe,
+    isLoading,
+    error,
+  };
+}
+
+function useDeleteRecipe(id: number) {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>("");
+
+  const handleDeleteRecipe = async () => {
+    setIsLoading(true);
+
+    try {
+      const res = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/recipes/${id}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to delete recipe.");
+      }
+
+      navigation.navigate("RecipeList");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    deleteRecipe: handleDeleteRecipe,
+    isLoading,
+    error,
+  };
+}
+
+type UpdateRecipeDto = {
   title: string;
   time: number;
   description: string;
@@ -92,55 +176,26 @@ export default function UpdateRecipeScreen({
 }: StaticScreenProps<{ id: number; title: string; time: number }>) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  const [formValues, setFormValues] = useState<UpdateRecipeForm>({
+  const {
+    updateRecipe,
+    isLoading: isUpdating,
+    error: updateError,
+  } = useUpdateRecipe(route.params.id);
+
+  const {
+    deleteRecipe,
+    isLoading: isDeleting,
+    error: deleteError,
+  } = useDeleteRecipe(route.params.id);
+
+  const [formValues, setFormValues] = useState<UpdateRecipeDto>({
     title: route.params.title,
     time: route.params.time,
     description: "",
   });
 
-  const handleCreateRecipe = async () => {
-    try {
-      const res = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL}/recipes/${route.params.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title: formValues.title,
-            description: "",
-            prep_time_seconds: formValues.time,
-          }),
-        },
-      );
-      const data = await res.json();
-      if (!data) {
-        return;
-      }
-      navigation.navigate("RecipeDetails", { id: data.id });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDeleteRecipe = async () => {
-    try {
-      const res = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL}/recipes/${route.params.id}`,
-        {
-          method: "DELETE",
-        },
-      );
-      const data = await res.json();
-      if (!data) {
-        return;
-      }
-      navigation.navigate("RecipeList");
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const isLoading = isUpdating || isDeleting;
+  const error = updateError || deleteError;
 
   return (
     <SafeAreaView>
@@ -151,103 +206,117 @@ export default function UpdateRecipeScreen({
           padding: 16,
         }}
       >
-        <View
-          style={{
-            paddingBottom: 16,
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <Pressable onPress={() => navigation.navigate("RecipeList")}>
-            <Text style={{ color: tokens.color.ink45 }}>cancel</Text>
-          </Pressable>
-          <Text style={{ color: tokens.color.ink35 }}>update recipe</Text>
-          <Pressable onPress={handleCreateRecipe}>
-            <Text style={{ color: tokens.color.redPen }}>save</Text>
-          </Pressable>
-        </View>
-
-        <View style={{ gap: 16 }}>
-          <Text>Name it</Text>
-          <TextInput
-            value={formValues.title}
-            onChangeText={(value) =>
-              setFormValues((prev) => ({ ...prev, title: value }))
-            }
-            placeholder="Sunday Ragu..."
-            style={{
-              borderBottomColor: tokens.color.hairline,
-              borderBottomWidth: 1,
-            }}
-          />
-
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              width: "100%",
-              gap: 8,
-            }}
-          >
-            <View style={{ flex: 1 }}>
-              <Text>Time</Text>
-              <TextInput
-                value={formValues.time ? String(formValues.time) : ""}
-                onChangeText={(value) =>
-                  setFormValues((prev) => ({ ...prev, time: Number(value) }))
-                }
-                placeholder="35 mins"
-                style={{
-                  borderBottomColor: tokens.color.ink40,
-                  borderBottomWidth: 1,
-                }}
-              />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text>Serves</Text>
-              <TextInput
-                placeholder="serves 2"
-                style={{
-                  borderBottomColor: tokens.color.ink40,
-                  borderBottomWidth: 1,
-                }}
-              />
-            </View>
-          </View>
-
-          <View>
-            <Text>Ingredients</Text>
-            <WritingBookTextArea />
-          </View>
-
-          <View>
-            <Text>Methods</Text>
-            <WritingBookTextArea />
-          </View>
-        </View>
-
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-          }}
-        >
-          <Pressable onPress={handleDeleteRecipe}>
-            <Text
+        {isLoading ? (
+          <Text>Loading...</Text>
+        ) : error ? (
+          <Text>{error}</Text>
+        ) : (
+          <>
+            <View
               style={{
-                opacity: 0.75,
-                color: tokens.color.redPen,
-                fontSize: 18,
-                width: "100%",
-                padding: 24,
+                paddingBottom: 16,
+                flexDirection: "row",
+                justifyContent: "space-between",
               }}
             >
-              delete this recipe
-            </Text>
-          </Pressable>
-        </View>
+              <Pressable onPress={() => navigation.navigate("RecipeList")}>
+                <Text style={{ color: tokens.color.ink45 }}>cancel</Text>
+              </Pressable>
+
+              <Text style={{ color: tokens.color.ink35 }}>update recipe</Text>
+
+              <Pressable onPress={() => updateRecipe(formValues)}>
+                <Text style={{ color: tokens.color.redPen }}>save</Text>
+              </Pressable>
+            </View>
+
+            <View style={{ gap: 16 }}>
+              <Text>Name it</Text>
+
+              <TextInput
+                value={formValues.title}
+                onChangeText={(value) =>
+                  setFormValues((prev) => ({ ...prev, title: value }))
+                }
+                placeholder="Sunday Ragu..."
+                style={{
+                  borderBottomColor: tokens.color.hairline,
+                  borderBottomWidth: 1,
+                }}
+              />
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  width: "100%",
+                  gap: 8,
+                }}
+              >
+                <View style={{ flex: 1 }}>
+                  <Text>Time</Text>
+
+                  <TextInput
+                    value={formValues.time ? String(formValues.time) : ""}
+                    onChangeText={(value) =>
+                      setFormValues((prev) => ({
+                        ...prev,
+                        time: Number(value),
+                      }))
+                    }
+                    placeholder="35 mins"
+                    style={{
+                      borderBottomColor: tokens.color.ink40,
+                      borderBottomWidth: 1,
+                    }}
+                  />
+                </View>
+
+                <View style={{ flex: 1 }}>
+                  <Text>Serves</Text>
+
+                  <TextInput
+                    placeholder="serves 2"
+                    style={{
+                      borderBottomColor: tokens.color.ink40,
+                      borderBottomWidth: 1,
+                    }}
+                  />
+                </View>
+              </View>
+
+              <View>
+                <Text>Ingredients</Text>
+                <WritingBookTextArea />
+              </View>
+
+              <View>
+                <Text>Methods</Text>
+                <WritingBookTextArea />
+              </View>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+              }}
+            >
+              <Pressable onPress={deleteRecipe}>
+                <Text
+                  style={{
+                    opacity: 0.75,
+                    color: tokens.color.redPen,
+                    fontSize: 18,
+                    width: "100%",
+                    padding: 24,
+                  }}
+                >
+                  delete this recipe
+                </Text>
+              </Pressable>
+            </View>
+          </>
+        )}
       </View>
     </SafeAreaView>
   );
