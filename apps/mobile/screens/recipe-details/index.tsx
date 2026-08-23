@@ -30,6 +30,8 @@ const MOCK_STEPS = [
 ];
 
 function useFetchRecipe(id: number) {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>("");
@@ -53,7 +55,6 @@ function useFetchRecipe(id: number) {
           setError("Something went wrong.");
         }
       } finally {
-        navigation.navigate("RecipeList");
         setIsLoading(false);
       }
     };
