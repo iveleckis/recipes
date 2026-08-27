@@ -1,9 +1,11 @@
 import express, { type Express, type Request, type Response } from "express";
 import { handleSeedData, initDatabase } from "./database/index.ts";
 import recipeRouter from "./routes/recipe.ts";
+import helmet from "helmet";
 
 const app: Express = express();
 
+app.use(helmet());
 app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
