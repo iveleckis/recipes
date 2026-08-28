@@ -6,10 +6,8 @@ import recipeRouter from "./routes/recipe.ts";
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 3,
+  limit: 50,
 });
-
-// Apply the rate limiting middleware to all requests.
 
 const app: Express = express();
 
