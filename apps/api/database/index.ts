@@ -1,3 +1,4 @@
+import type { User } from "@recipes/contracts";
 import Database from "better-sqlite3";
 import fs from "fs";
 import path from "path";
@@ -13,9 +14,13 @@ export function initDatabase(): void {
 
 function seedUser(): void {
   try {
-    db.prepare<string, void>("INSERT INTO users(name) VALUES (?);").run(
-      "Ignas",
-    );
+    db.prepare<[string, string], void>(
+      "INSERT INTO users(username, password) VALUES (?, ?);",
+    ).run("Ignas", "testpwd123");
+    console.log("user inserted");
+    db.prepare<[string, string], void>(
+      "INSERT INTO users(username, password) VALUES (?, ?);",
+    ).run("Kamile", "kamile123");
     console.log("user inserted");
   } catch (err) {
     console.error(err);
@@ -26,13 +31,17 @@ type InsertRecipeArgs = readonly [number, string, string, number];
 
 function seedRecipe() {
   try {
-    const row = db.prepare<[], { id: number }>("select id from users;").get();
-    if (row?.id === undefined) throw new Error("User select error");
+    const users = db
+      .prepare<[], { id: User["id"] }>("select id from users;")
+      .all();
+    if (users === undefined) throw new Error("User select error");
 
-    db.prepare<InsertRecipeArgs, void>(
-      "INSERT INTO recipes(user_id, title, description, prep_time_seconds) VALUES (?, ?, ?, ?);",
-    ).run([row.id, "Test Recipe", "Lorem ipsum sit", 600]);
-    console.log("recipe inserted");
+    users.forEach((user) => {
+      db.prepare<InsertRecipeArgs, void>(
+        "INSERT INTO recipes(user_id, title, description, prep_time_seconds) VALUES (?, ?, ?, ?);",
+      ).run([user.id, "Test Recipe", "Lorem ipsum sit", 600]);
+      console.log("recipe inserted");
+    });
   } catch (err) {
     console.error(err);
   }
