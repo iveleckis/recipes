@@ -31,7 +31,7 @@ app.use("/recipes", authenticateToken, recipeRouter);
 async function main() {
   try {
     initDatabase();
-    handleSeedData();
+    handleSeedData(true);
     app.listen(3000);
   } catch (err) {
     console.error(err);
