@@ -4,3 +4,7 @@ node_modules
 /apps/api/data/*.db
 /apps/api/data/*.db-shm
 /apps/api/data/*.db-wal
+/apps/api/.env
+
+# packages/contracts
+/packages/contracts/dist
