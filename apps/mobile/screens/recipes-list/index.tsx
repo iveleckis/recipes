@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { View, Text, TextInput, StyleSheet, Pressable } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
@@ -7,18 +7,34 @@ import { type NavigationProp, useNavigation } from "@react-navigation/native";
 import { type Recipe } from "@recipes/contracts";
 import { RootStackParamList } from "../../types/navigation";
 import { tokens } from "../../constants/tokens";
+import { AuthContext } from "../../providers/AuthProvider";
 
 function useFetchRecipes() {
+  const authContext = useContext(AuthContext);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>("");
 
+  const navitaion = useNavigation<NavigationProp<RootStackParamList>>();
+
   useEffect(() => {
     const fetchRecipes = async () => {
+      if (authContext === null || authContext.token === null) {
+        navitaion.navigate("Login");
+        return;
+      }
+
       setIsLoading(true);
       try {
-        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/recipes`);
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/recipes`, {
+          headers: {
+            Authorization: authContext.token,
+          },
+        });
         const data = await res.json();
+        if (!res.ok) {
+          throw new Error("Something went wrong");
+        }
         setRecipes(data);
       } catch (err) {
         if (err instanceof Error) {
@@ -93,6 +109,8 @@ export default function RecipeListScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const { recipes, isLoading, error: recipeError } = useFetchRecipes();
+
+  console.log(recipeError, recipes);
 
   const [query, setQuery] = useState("");
 
