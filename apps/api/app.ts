@@ -2,7 +2,7 @@ import express, { type Express } from "express";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import dotenv from "dotenv";
-import { handleSeedData, initDatabase } from "./database/index.ts";
+import { initDatabase } from "./database/index.ts";
 import { authenticateToken } from "./middlewares/auth.ts";
 import authRouter from "./routes/auth.ts";
 import recipeRouter from "./routes/recipe.ts";
@@ -31,8 +31,7 @@ app.use("/recipes", authenticateToken, recipeRouter);
 async function main() {
   try {
     initDatabase();
-    handleSeedData(true);
-    app.listen(3000);
+    app.listen(Number(process.env.PORT) || 3000, "0.0.0.0");
   } catch (err) {
     console.error(err);
     process.exit(1);
