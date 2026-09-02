@@ -3,7 +3,10 @@ import Database from "better-sqlite3";
 import fs from "fs";
 import path from "path";
 
-const db = new Database("./data/app.db");
+const dbPath = process.env.RAILWAY_VOLUME_MOUNT_PATH
+  ? `${process.env.RAILWAY_VOLUME_MOUNT_PATH}/data.db`
+  : "./data/app.db";
+const db = new Database(dbPath);
 
 export function initDatabase(): void {
   db.pragma("foreign_keys = on");
