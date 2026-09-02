@@ -15,7 +15,7 @@ const limiter = rateLimit({
 });
 
 const authRuoteLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 60 minutes
+  windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 15,
 });
 
@@ -27,8 +27,8 @@ app.use(helmet());
 app.use(limiter);
 app.use(express.json());
 
-app.get("/ip", (request, response) => {
-  response.send(request.ip);
+app.post("/auth/test", (req, res) => {
+  res.status(200).json({ ok: true });
 });
 
 app.use("/auth", authRuoteLimiter, authRouter);
