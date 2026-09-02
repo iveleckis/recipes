@@ -21,9 +21,15 @@ const authRuoteLimiter = rateLimit({
 
 const app: Express = express();
 
+app.set("trust proxy", 1);
+
 app.use(helmet());
 app.use(limiter);
 app.use(express.json());
+
+app.get("/ip", (request, response) => {
+  response.send(request.ip);
+});
 
 app.use("/auth", authRuoteLimiter, authRouter);
 app.use("/recipes", authenticateToken, recipeRouter);
