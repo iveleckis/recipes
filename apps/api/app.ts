@@ -15,8 +15,8 @@ const limiter = rateLimit({
 });
 
 const authRuoteLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 60 minutes
-  limit: 3,
+  windowMs: 15 * 60 * 1000, // 60 minutes
+  limit: 15,
 });
 
 const app: Express = express();
