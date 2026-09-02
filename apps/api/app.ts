@@ -27,10 +27,6 @@ app.use(helmet());
 app.use(limiter);
 app.use(express.json());
 
-app.post("/auth/test", (req, res) => {
-  res.status(200).json({ ok: true });
-});
-
 app.use("/auth", authRuoteLimiter, authRouter);
 app.use("/recipes", authenticateToken, recipeRouter);
 
