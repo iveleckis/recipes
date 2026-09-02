@@ -6,5 +6,8 @@ node_modules
 /apps/api/data/*.db-wal
 /apps/api/.env
 
+# web
+/apps/web/.env
+
 # packages/contracts
 /packages/contracts/dist
