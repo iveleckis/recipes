@@ -126,6 +126,7 @@ type CreateRecipeDto = {
 };
 
 export default function CreateRecipeScreen() {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { createRecipe, isLoading, error } = useCreateRecipe();
   const [formValues, setFormValues] = useState<CreateRecipeDto>({
     title: "",
