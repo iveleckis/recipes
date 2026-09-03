@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch app.ts",
     "build": "tsc",
-    "start": "node dist/data.js",
+    "start": "node dist/app.js",
     "seed:user": "tsx scripts/seedUser.ts"
   },
   "keywords": [],

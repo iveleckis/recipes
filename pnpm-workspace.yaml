@@ -3,6 +3,7 @@ packages:
   - packages/*
 catalog:
   typescript: ^7.0.2
+  zod: ^4.4.3
 minimumReleaseAge: 0
 onlyBuiltDependencies:
   - better-sqlite3

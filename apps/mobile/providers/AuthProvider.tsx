@@ -2,7 +2,7 @@ import { createContext, PropsWithChildren, useContext, useState } from "react";
 
 type AuthContextValues = {
   token: string | null;
-  setToken: (token: string) => void;
+  setToken: (token: string | null) => void;
 } | null;
 
 export function useAuth() {

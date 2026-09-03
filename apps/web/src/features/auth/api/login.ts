@@ -1,15 +1,7 @@
+import type { LoginRequest, LoginResponse } from "@recipes/contracts";
 import { api } from "../../../config/axios";
 
-export const login = async ({
-  username,
-  password,
-}: {
-  username: string;
-  password: string;
-}): Promise<{ token: string }> => {
-  const { data } = await api.post<{ token: string }>("/auth/login", {
-    username,
-    password,
-  });
+export const login = async (input: LoginRequest): Promise<LoginResponse> => {
+  const { data } = await api.post<LoginResponse>("/auth/login", input);
   return data;
 };

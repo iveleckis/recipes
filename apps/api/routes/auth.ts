@@ -1,13 +1,14 @@
 import { Router, type Request, type Response } from "express";
 import jwt from "jsonwebtoken";
-import { LoginDtoSchema, type User } from "@recipes/contracts";
+import { loginRequestSchema } from "@recipes/contracts";
 import db from "../database/index.ts";
+import type { User } from "../database/types/user.ts";
 
 const router = Router();
 
 router.post("/login", (req: Request, res: Response) => {
   const body = req.body;
-  const result = LoginDtoSchema.safeParse(body);
+  const result = loginRequestSchema.safeParse(body);
 
   if (!result.success) {
     return res.status(400).json({
