@@ -1,7 +1,7 @@
-import type { User } from "@recipes/contracts";
 import Database from "better-sqlite3";
 import fs from "fs";
 import path from "path";
+import type { User } from "./types/user.ts";
 
 const dbPath = process.env.RAILWAY_VOLUME_MOUNT_PATH
   ? `${process.env.RAILWAY_VOLUME_MOUNT_PATH}/data.db`
