@@ -1,5 +1,6 @@
 import express, { type Express } from "express";
 import helmet from "helmet";
+import cors from "cors";
 import { rateLimit } from "express-rate-limit";
 import dotenv from "dotenv";
 import { initDatabase } from "./database/index.ts";
@@ -20,6 +21,17 @@ const authRuoteLimiter = rateLimit({
 });
 
 const app: Express = express();
+
+const allowedOrigins =
+  process.env.MODE === "DEV"
+    ? [process.env.DEV_CLIENT_URL ?? ""]
+    : [process.env.CLIENT_URL ?? ""];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+  }),
+);
 
 app.set("trust proxy", 2);
 

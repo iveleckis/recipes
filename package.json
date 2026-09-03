@@ -4,12 +4,15 @@
   "packageManager": "pnpm@10.7.0",
   "scripts": {
     "dev:mobile": "pnpm --filter mobile start",
-    "dev:api": "pnpm --filter api dev",
+    "dev:api": "VITE_MODE=DEV pnpm --filter api dev",
     "dev:web": "pnpm --filter web dev",
     "dev:full": "concurrently -n api,mobile -c blue,green \"pnpm run dev:api\" \"pnpm run dev:mobile\""
   },
   "devDependencies": {
     "concurrently": "^10.0.4",
     "typescript": "catalog:"
+  },
+  "dependencies": {
+    "zod": "catalog:"
   }
 }

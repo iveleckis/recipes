@@ -1,3 +1,4 @@
+import "dotenv/config";
 import db from "../database/index.ts";
 
 const username = process.env.SEED_USERNAME;

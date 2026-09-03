@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js",
     "seed:user": "tsx scripts/seedUser.ts"
   },
   "keywords": [],
@@ -13,6 +15,7 @@
   "dependencies": {
     "@recipes/contracts": "workspace:^",
     "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.6.2",
@@ -22,6 +25,7 @@
   },
   "devDependencies": {
     "@types/better-sqlite3": "^9.6.0",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.1.2",
