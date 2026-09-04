@@ -1,10 +1,19 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
 import Login from "./features/auth/pages/Login";
 import RecipeList from "./features/recipes/pages/RecipeList";
 import RecipeCreate from "./features/recipes/pages/RecipeCreate";
 import { PrivateRoute } from "./components/PrivateRoute";
+import { ROUTES } from "./constants/routes";
 
 const router = createBrowserRouter([
+  {
+    path: "/auth",
+    element: <Login />,
+  },
   {
     element: <PrivateRoute />,
     children: [
@@ -19,8 +28,8 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/auth",
-    element: <Login />,
+    path: "*",
+    element: <Navigate to={ROUTES.recipes} replace />,
   },
 ]);
 
