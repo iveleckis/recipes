@@ -19,7 +19,7 @@ export default function Login() {
 
     try {
       const result = await mutateAsync({ username, password });
-      authContext?.setToken(result.token);
+      authContext?.setToken("Bearer " + result.token);
     } catch (err) {
       if (err instanceof Error) {
         console.error(err.message);
