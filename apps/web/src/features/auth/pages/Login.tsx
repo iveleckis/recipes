@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "../api/login";
 import { useAuth } from "../../../providers/auth/useAuth";
+import { ROUTES } from "../../../constants/routes";
 
 export default function Login() {
   const authContext = useAuth();
@@ -32,7 +33,7 @@ export default function Login() {
   };
 
   if (authContext?.token) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={ROUTES.recipes} replace />;
   }
 
   return (

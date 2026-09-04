@@ -6,7 +6,8 @@
     "dev:mobile": "pnpm --filter mobile start",
     "dev:api": "VITE_MODE=DEV pnpm --filter api dev",
     "dev:web": "pnpm --filter web dev",
-    "dev:full": "concurrently -n api,mobile -c blue,green \"pnpm run dev:api\" \"pnpm run dev:mobile\""
+    "dev:full": "concurrently -n api,web -c blue,green \"pnpm run dev:api\" \"pnpm run dev:web\"",
+    "build:packages-contracts": "pnpm --filter ./packages/contracts build"
   },
   "devDependencies": {
     "concurrently": "^10.0.4",

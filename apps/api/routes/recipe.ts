@@ -1,7 +1,12 @@
 import { Router, type Request, type Response } from "express";
-import { type GetRecipesResponse } from "@recipes/contracts";
+import type {
+  GetRecipesResponse,
+  CreateRecipeResponse,
+  CreateRecipeRequest,
+} from "@recipes/contracts";
 import type { Recipe } from "../database/types/recipe.ts";
 import db from "../database/index.ts";
+import type { CustomError } from "../types/CustomError.ts";
 
 const router = Router();
 
@@ -43,27 +48,34 @@ router.get("/:id", (req: Request, res: Response) => {
   }
 });
 
-router.post("/", (req: Request, res: Response) => {
-  const body = req.body;
-  try {
-    const result = db
-      .prepare<
-        readonly [
-          Recipe["user_id"],
-          Recipe["title"],
-          Recipe["description"],
-          Recipe["prep_time_seconds"],
-        ],
-        Recipe
-      >("INSERT INTO recipes(user_id, title, description, prep_time_seconds) VALUES(?, ?, ?, ?) RETURNING *;")
-      .get([req.user.id, body.title, body.description, body.prep_time_seconds]);
+router.post<{}, CreateRecipeResponse | CustomError, CreateRecipeRequest, {}>(
+  "/",
+  (req, res) => {
+    const body = req.body;
+    try {
+      const result = db
+        .prepare<
+          readonly [
+            Recipe["user_id"],
+            Recipe["title"],
+            Recipe["description"],
+            Recipe["prep_time_seconds"],
+          ],
+          Pick<Recipe, "id" | "title"> | undefined
+        >("INSERT INTO recipes(user_id, title, description, prep_time_seconds) VALUES(?, ?, ?, ?) RETURNING id, title;")
+        .get([req.user.id, body.title, "", 0]);
 
-    res.status(201).json(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Something went wrong." });
-  }
-});
+      if (result === undefined) {
+        return res.status(500).json({ error: "Failed to create recipe" });
+      }
+
+      res.status(201).json(result);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Something went wrong." });
+    }
+  },
+);
 
 router.put("/:id", (req: Request, res: Response) => {
   const {
