@@ -1,0 +1,20 @@
+MPV - WEB
+- Recipe list
+    - Recipe Details
+        - Seed data
+        - Contract
+            - id, title, steps, ingredients, prep_time
+        - Endpoint
+        - Web UI (no sytling)
+            - Route
+    - Create recipes
+        - Contract
+            - title, steps, ingredients, prep_time
+        - Endpoint
+        - Add button
+        - Web UI (no styling)
+            - Route
+            - Form
+                - title, steps, ingredients
+        
+MVP - PWA
