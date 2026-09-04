@@ -34,7 +34,18 @@ export default function RecipeList() {
           ))}
         </ul>
       )}
-      <Link to={ROUTES.createRecipe}>Add new recipe</Link>
+      <Link
+        style={{
+          border: "1px solid black",
+          backgroundColor: "lightgrey",
+          textDecoration: "none",
+          color: "black",
+          padding: "4px",
+        }}
+        to={ROUTES.createRecipe}
+      >
+        Add new recipe
+      </Link>
     </>
   );
 }
