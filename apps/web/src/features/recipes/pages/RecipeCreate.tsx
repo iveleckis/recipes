@@ -1,18 +1,12 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { z } from "zod";
+import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { createRecipe } from "../api/createRecipe";
-import { useNavigate } from "react-router-dom";
-
-const createRecipeSchema = z.object({
-  title: z
-    .string()
-    .min(1, "Recipe name is required")
-    .max(50, "Recipe name must be 50 characters or less"),
-});
-
-type CreateRecipeFormInputs = z.infer<typeof createRecipeSchema>;
+import {
+  createRecipeSchema,
+  type CreateRecipeFormInputs,
+} from "../schemas/createRecipeSchema";
 
 export default function RecipeCreate() {
   const navigate = useNavigate();
