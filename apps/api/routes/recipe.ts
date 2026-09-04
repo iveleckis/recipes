@@ -1,14 +1,19 @@
 import { Router, type Request, type Response } from "express";
-import { type Recipe } from "@recipes/contracts";
+import { type GetRecipesResponse } from "@recipes/contracts";
+import type { Recipe } from "../database/types/recipe.ts";
 import db from "../database/index.ts";
 
 const router = Router();
 
-router.get("/", (req: Request, res: Response) => {
+router.get<GetRecipesResponse>("/", (req, res) => {
   try {
     const rows = db
-      .prepare<number, Recipe>("SELECT * FROM recipes WHERE user_id = ?;")
+      .prepare<
+        number,
+        Pick<Recipe, "id" | "title">
+      >("SELECT id, title FROM recipes WHERE user_id = ?;")
       .all(req.user.id);
+
     res.status(200).json(rows);
   } catch (err) {
     console.error(err);

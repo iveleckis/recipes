@@ -12,3 +12,6 @@ dist
 
 # packages/contracts
 /packages/contracts/dist
+
+# misc
+todo.txt
