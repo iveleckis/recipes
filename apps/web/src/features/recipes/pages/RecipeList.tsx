@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getRecipes } from "../api/getRecipes";
+import { Link } from "react-router-dom";
 
 export default function RecipeList() {
   const {
@@ -30,6 +31,9 @@ export default function RecipeList() {
           ))}
         </ul>
       )}
+      <Link to="/recipes/create">
+        <button>Add new recipe</button>
+      </Link>
     </>
   );
 }

@@ -32,7 +32,7 @@ export default function Login() {
   };
 
   if (authContext?.token) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/recipes" replace />;
   }
 
   return (
