@@ -19,7 +19,7 @@ export default function RecipeCreate() {
     resolver: zodResolver(createRecipeSchema),
   });
 
-  const { mutateAsync, isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: createRecipe,
     onSuccess(data) {
       const existingRecipes = queryClient.getQueryData<GetRecipesResponse>(
@@ -35,14 +35,13 @@ export default function RecipeCreate() {
 
       navigate(ROUTES.recipes);
     },
+    onError(error) {
+      console.error(error);
+    },
   });
 
-  const onSubmit: SubmitHandler<CreateRecipeFormInputs> = async (data) => {
-    try {
-      await mutateAsync(data);
-    } catch (err) {
-      console.error(err);
-    }
+  const onSubmit: SubmitHandler<CreateRecipeFormInputs> = (data) => {
+    mutate(data);
   };
 
   const onCancel = () => {

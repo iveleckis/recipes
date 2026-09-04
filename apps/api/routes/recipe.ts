@@ -6,6 +6,7 @@ import type {
 } from "@recipes/contracts";
 import type { Recipe } from "../database/types/recipe.ts";
 import db from "../database/index.ts";
+import type { CustomError } from "../types/CustomError.ts";
 
 const router = Router();
 
@@ -46,10 +47,6 @@ router.get("/:id", (req: Request, res: Response) => {
     res.status(500).json({ error: "Something went wrong." });
   }
 });
-
-type CustomError = {
-  error: string;
-};
 
 router.post<{}, CreateRecipeResponse | CustomError, CreateRecipeRequest, {}>(
   "/",
