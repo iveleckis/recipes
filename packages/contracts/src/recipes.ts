@@ -10,6 +10,20 @@ export const getRecipesResponseSchema = z.array(
 
 export type GetRecipesResponse = z.infer<typeof getRecipesResponseSchema>;
 
+// GET ONE
+export const getRecipeParamsSchema = z.object({
+  id: z.coerce.number().int().nonnegative(),
+});
+
+export type GetRecipeParams = z.infer<typeof getRecipeParamsSchema>;
+
+export const getRecipeResponseSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+});
+
+export type GetRecipeResponse = z.infer<typeof getRecipeResponseSchema>;
+
 // CREATE
 export const createRecipeRequestSchema = z.object({
   title: z.string(),

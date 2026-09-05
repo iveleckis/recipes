@@ -8,22 +8,27 @@ import RecipeList from "./features/recipes/pages/RecipeList";
 import RecipeCreate from "./features/recipes/pages/RecipeCreate";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { ROUTES } from "./constants/routes";
+import RecipeDetails from "./features/recipes/pages/RecipeDetails";
 
 const router = createBrowserRouter([
   {
-    path: "/auth",
+    path: ROUTES.auth,
     element: <Login />,
   },
   {
     element: <PrivateRoute />,
     children: [
       {
-        path: "/recipes",
+        path: ROUTES.recipes,
         element: <RecipeList />,
       },
       {
-        path: "/recipes/create",
+        path: ROUTES.createRecipe,
         element: <RecipeCreate />,
+      },
+      {
+        path: ROUTES.recipeDetails,
+        element: <RecipeDetails />,
       },
     ],
   },

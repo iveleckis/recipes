@@ -6,6 +6,9 @@ import {
   type DeleteRecipeResponse,
   type DeleteRecipeParams,
   deleteRecipeParamsSchema,
+  type GetRecipeResponse,
+  type GetRecipeParams,
+  getRecipeParamsSchema,
 } from "@recipes/contracts";
 import type { Recipe } from "../database/types/recipe.ts";
 import db from "../database/index.ts";
@@ -29,27 +32,36 @@ router.get<GetRecipesResponse>("/", (req, res) => {
   }
 });
 
-router.get("/:id", (req: Request, res: Response) => {
-  const { id } = req.params;
+router.get<GetRecipeParams, GetRecipeResponse | CustomError, {}, {}>(
+  "/:id",
+  (req, res) => {
+    const result = getRecipeParamsSchema.safeParse(req.params);
 
-  try {
-    const row = db
-      .prepare<
-        readonly [number, number],
-        Recipe
-      >("SELECT * FROM recipes WHERE user_id = ? AND id = ?;")
-      .get([req.user.id, Number(id)]);
-
-    if (!row) {
-      return res.status(404).json({ error: "Recipe not found." });
+    if (!result.success) {
+      return res.status(400).json({ error: "Invalid recipe id" });
     }
 
-    res.status(200).json(row);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Something went wrong." });
-  }
-});
+    const id = result.data.id;
+
+    try {
+      const row = db
+        .prepare<
+          readonly [Recipe["user_id"], Recipe["id"]],
+          Pick<Recipe, "id" | "title"> | undefined
+        >("SELECT id, title FROM recipes WHERE user_id = ? AND id = ?;")
+        .get([req.user.id, id]);
+
+      if (!row) {
+        return res.status(404).json({ error: "Recipe not found." });
+      }
+
+      res.status(200).json(row);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Something went wrong." });
+    }
+  },
+);
 
 router.post<{}, CreateRecipeResponse | CustomError, CreateRecipeRequest, {}>(
   "/",
