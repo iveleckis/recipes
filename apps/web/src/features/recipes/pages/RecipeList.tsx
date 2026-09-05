@@ -76,7 +76,17 @@ export default function RecipeList() {
               }}
               key={recipe.id}
             >
-              <span>{recipe.title}</span>
+              <Link
+                style={{
+                  width: "100%",
+                  textDecoration: "none",
+                  color: "black",
+                  display: "inline-block",
+                }}
+                to={ROUTES.recipeDetails.replace(":id", String(recipe.id))}
+              >
+                {recipe.title}
+              </Link>
               <button onClick={() => handleDelete(recipe.id)}>X</button>
             </li>
           ))}
