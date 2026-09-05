@@ -1,8 +1,11 @@
 import { Router, type Request, type Response } from "express";
-import type {
-  GetRecipesResponse,
-  CreateRecipeResponse,
-  CreateRecipeRequest,
+import {
+  type GetRecipesResponse,
+  type CreateRecipeResponse,
+  type CreateRecipeRequest,
+  type DeleteRecipeResponse,
+  type DeleteRecipeParams,
+  deleteRecipeParamsSchema,
 } from "@recipes/contracts";
 import type { Recipe } from "../database/types/recipe.ts";
 import db from "../database/index.ts";
@@ -113,28 +116,31 @@ router.put("/:id", (req: Request, res: Response) => {
   }
 });
 
-router.delete("/:id", (req: Request, res: Response) => {
-  const {
-    params: { id },
-  } = req;
+router.delete<DeleteRecipeParams, DeleteRecipeResponse | CustomError, {}, {}>(
+  "/:id",
+  (req, res) => {
+    const params = deleteRecipeParamsSchema.parse({
+      id: Number(req.params.id),
+    });
 
-  try {
-    const row = db
-      .prepare<
-        readonly [Recipe["user_id"], Recipe["id"]],
-        Pick<Recipe, "id">
-      >("DELETE FROM recipes WHERE user_id = ? AND id = ? RETURNING id;")
-      .get([req.user.id, Number(id)]);
+    try {
+      const row = db
+        .prepare<
+          readonly [Recipe["user_id"], Recipe["id"]],
+          Pick<Recipe, "id">
+        >("DELETE FROM recipes WHERE user_id = ? AND id = ? RETURNING id;")
+        .get([req.user.id, Number(params.id)]);
 
-    if (!row) {
-      return res.status(404).json({ error: "Recipe not found." });
+      if (!row) {
+        return res.status(404).json({ error: "Recipe not found." });
+      }
+
+      res.status(200).json(row);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Something went wrong." });
     }
-
-    res.status(200).json(row);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Something went wrong." });
-  }
-});
+  },
+);
 
 export default router;
