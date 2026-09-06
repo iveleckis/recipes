@@ -39,7 +39,7 @@ export default function RecipeListPage() {
     }
   };
 
-  const handleSelectRecipeId = (recipeId: number) => {
+  const handleOpenRecipeDetails = (recipeId: number) => {
     setIsCreateRecipeFormOpen(false);
     setSelectedRecipeId(recipeId);
   };
@@ -49,16 +49,11 @@ export default function RecipeListPage() {
     setIsCreateRecipeFormOpen(true);
   };
 
-  const handleOnCreateRecipe = (id: number) => {
-    setIsCreateRecipeFormOpen(false);
-    setSelectedRecipeId(id);
-  };
-
   return (
-    <div style={{}}>
+    <>
       <div style={{ display: "flex", gap: 4 }}>
         <div>
-          <RecipeList onRecipeSelect={handleSelectRecipeId} />
+          <RecipeList onRecipeSelect={handleOpenRecipeDetails} />
           <button
             style={{
               width: "100%",
@@ -71,13 +66,12 @@ export default function RecipeListPage() {
             Add new recipe
           </button>
         </div>
-        {selectedRecipeId && (
+        {selectedRecipeId ? (
           <RecipeDetails id={selectedRecipeId} onRemoveRecipe={handleDelete} />
-        )}
-        {isCreateRecipeFormOpen && (
-          <CreateRecipeForm onCreate={handleOnCreateRecipe} />
-        )}
+        ) : isCreateRecipeFormOpen ? (
+          <CreateRecipeForm onCreate={handleOpenRecipeDetails} />
+        ) : null}
       </div>
-    </div>
+    </>
   );
 }
