@@ -21,9 +21,9 @@ export default function RecipeList({ onRecipeSelect }: Props) {
     <>
       {isLoading ? (
         <>Loading...</>
-      ) : isError ? (
+      ) : isError || recipes === undefined ? (
         <>Something went wrong...</>
-      ) : recipes === undefined || recipes.length === 0 ? (
+      ) : recipes.length === 0 ? (
         <>No recipes found...</>
       ) : (
         <ul
