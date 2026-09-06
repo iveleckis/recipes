@@ -1,5 +1,4 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createRecipe } from "../api/createRecipe";
@@ -7,13 +6,15 @@ import {
   createRecipeSchema,
   type CreateRecipeFormInputs,
 } from "../schemas/createRecipeSchema";
-import { ROUTES } from "../../../constants/routes";
 import { QUERY_KEYS } from "../../../constants/queryKeys";
 import type { GetRecipesResponse } from "@recipes/contracts";
 
-export default function RecipeCreate() {
+type Props = {
+  onCreate: (id: number) => void;
+};
+
+export default function CreateRecipeForm({ onCreate }: Props) {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   const form = useForm<CreateRecipeFormInputs>({
     resolver: zodResolver(createRecipeSchema),
@@ -33,7 +34,7 @@ export default function RecipeCreate() {
         ]);
       }
 
-      navigate(ROUTES.recipes);
+      onCreate(data.id);
     },
     onError(error) {
       console.error(error);
@@ -42,10 +43,6 @@ export default function RecipeCreate() {
 
   const onSubmit: SubmitHandler<CreateRecipeFormInputs> = (data) => {
     mutate(data);
-  };
-
-  const onCancel = () => {
-    navigate(ROUTES.recipes);
   };
 
   return (
@@ -59,9 +56,6 @@ export default function RecipeCreate() {
           <div>{form.formState.errors.title.message}</div>
         )}
 
-        <button type="button" onClick={onCancel} disabled={isPending}>
-          Cancel
-        </button>
         <button type="submit" disabled={isPending}>
           {isPending ? "Loading..." : "Create"}
         </button>
