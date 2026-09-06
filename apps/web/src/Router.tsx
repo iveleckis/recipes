@@ -3,12 +3,10 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import Login from "./features/auth/pages/Login";
-import RecipeList from "./features/recipes/pages/RecipeList";
-import RecipeCreate from "./features/recipes/pages/RecipeCreate";
-import { PrivateRoute } from "./components/PrivateRoute";
 import { ROUTES } from "./constants/routes";
-import RecipeDetails from "./features/recipes/pages/RecipeDetails";
+import { PrivateRoute } from "./components/PrivateRoute";
+import Login from "./features/auth/pages/Login";
+import RecipeListPage from "./features/recipes/pages/RecipeListPage";
 
 const router = createBrowserRouter([
   {
@@ -20,15 +18,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: ROUTES.recipes,
-        element: <RecipeList />,
-      },
-      {
-        path: ROUTES.createRecipe,
-        element: <RecipeCreate />,
-      },
-      {
-        path: ROUTES.recipeDetails,
-        element: <RecipeDetails />,
+        element: <RecipeListPage />,
       },
     ],
   },
