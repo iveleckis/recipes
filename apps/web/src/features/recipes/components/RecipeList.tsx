@@ -33,22 +33,36 @@ export default function RecipeList({ onRecipeSelect }: Props) {
             gap: "4px",
           }}
         >
-          {recipes.map((recipe) => (
-            <li
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "300px",
-                borderBottom: "1px solid lightgrey",
-                padding: "4px",
-              }}
-              key={recipe.id}
-            >
-              <div onClick={() => onRecipeSelect(recipe.id)}>
-                {recipe.title}
-              </div>
-            </li>
-          ))}
+          <>
+            <p>By time since last made - {recipes.length} entries</p>
+            {recipes.map((recipe) => (
+              <li
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%",
+                  padding: "4px 0",
+                  gap: "8px",
+                }}
+                key={recipe.id}
+              >
+                <div
+                  style={{ whiteSpace: "nowrap" }}
+                  onClick={() => onRecipeSelect(recipe.id)}
+                >
+                  {recipe.title}
+                </div>
+                <div
+                  style={{
+                    width: "100%",
+                    borderBottom: "1px dotted lightgrey",
+                  }}
+                />
+                <div style={{ whiteSpace: "nowrap" }}>7 months</div>
+              </li>
+            ))}
+          </>
         </ul>
       )}
     </>

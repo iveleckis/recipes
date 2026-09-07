@@ -6,6 +6,7 @@ import RecipeDetails from "../components/RecipeDetails";
 import RecipeList from "../components/RecipeList";
 import { QUERY_KEYS } from "../../../constants/queryKeys";
 import CreateRecipeForm from "../components/CreateRecipeForm";
+import BookView from "../../../components/BookView";
 
 export default function RecipeListPage() {
   const queryClient = useQueryClient();
@@ -51,26 +52,42 @@ export default function RecipeListPage() {
 
   return (
     <>
-      <div style={{ display: "flex", gap: 4 }}>
-        <div>
-          <RecipeList onRecipeSelect={handleOpenRecipeDetails} />
-          <button
-            style={{
-              width: "100%",
-              marginTop: "12px",
-              textAlign: "center",
-              padding: "4px",
-            }}
-            onClick={handleOpenCreateRecipeForm}
-          >
-            Add new recipe
-          </button>
-        </div>
-        {selectedRecipeId ? (
-          <RecipeDetails id={selectedRecipeId} onRemoveRecipe={handleDelete} />
-        ) : isCreateRecipeFormOpen ? (
-          <CreateRecipeForm onCreate={handleOpenRecipeDetails} />
-        ) : null}
+      <div
+        style={{
+          padding: "24px",
+          height: "100%",
+          backgroundColor: "rgb(183, 179, 163)",
+        }}
+      >
+        <BookView
+          leftPage={
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+            >
+              <RecipeList onRecipeSelect={handleOpenRecipeDetails} />
+              <div
+                style={{
+                  borderBottom: "1px dotted lightgrey",
+                }}
+              />
+              <span onClick={handleOpenCreateRecipeForm}>
+                + Write a new recipe
+              </span>
+            </div>
+          }
+          rightPage={
+            <>
+              {selectedRecipeId ? (
+                <RecipeDetails
+                  id={selectedRecipeId}
+                  onRemoveRecipe={handleDelete}
+                />
+              ) : isCreateRecipeFormOpen ? (
+                <CreateRecipeForm onCreate={handleOpenRecipeDetails} />
+              ) : null}
+            </>
+          }
+        />
       </div>
     </>
   );
