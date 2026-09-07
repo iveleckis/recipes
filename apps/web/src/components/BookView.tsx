@@ -11,14 +11,14 @@ export default function BookView({ leftPage, rightPage }: Props) {
       style={{
         height: "100%",
         width: "100%",
-        border: "1px solid lightgrey",
+        border: "1px solid rgb(220, 220, 220)",
         boxShadow: "0px 4px 10px 0px rgba(0, 0, 0, 0.1)",
         display: "flex",
       }}
     >
       <div
         style={{
-          borderRight: "1px solid lightgrey",
+          borderRight: "1px solid rgb(220, 220, 220)",
           padding: "24px 20px",
           backgroundColor: "rgb(255, 246, 235)",
           flex: 1,
@@ -27,7 +27,7 @@ export default function BookView({ leftPage, rightPage }: Props) {
         <div
           style={{
             width: "100%",
-            borderBottom: "1px solid lightgrey",
+            borderBottom: "1px solid rgb(220, 220, 220)",
             display: "flex",
             justifyContent: "flex-end",
           }}

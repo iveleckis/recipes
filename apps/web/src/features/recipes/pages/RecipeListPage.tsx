@@ -55,7 +55,8 @@ export default function RecipeListPage() {
       <div
         style={{
           padding: "24px",
-          backgroundColor: "rgb(169, 133, 0)",
+          height: "100%",
+          backgroundColor: "rgb(183, 179, 163)",
         }}
       >
         <BookView
