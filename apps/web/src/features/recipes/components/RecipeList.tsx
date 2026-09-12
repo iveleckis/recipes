@@ -34,7 +34,9 @@ export default function RecipeList({ onRecipeSelect }: Props) {
           }}
         >
           <>
-            <p>By time since last made - {recipes.length} entries</p>
+            <p style={{ color: "rgb(150, 150, 150)", paddingBottom: "16px" }}>
+              By time since last made - {recipes.length} entries
+            </p>
             {recipes.map((recipe) => (
               <li
                 style={{

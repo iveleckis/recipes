@@ -2,66 +2,99 @@ import Database from "better-sqlite3";
 import fs from "fs";
 import path from "path";
 import type { User } from "./types/user.ts";
+import { migrations } from "./migrations/index.ts";
+import type { Version } from "./types/version.ts";
 
 const dbPath = process.env.RAILWAY_VOLUME_MOUNT_PATH
   ? `${process.env.RAILWAY_VOLUME_MOUNT_PATH}/data.db`
   : "./data/app.db";
 const db = new Database(dbPath);
 
-export function initDatabase(): void {
-  db.pragma("foreign_keys = on");
-  const file = path.join(import.meta.dirname + "/schema.sql");
+function readMigration(pathToFile: string): string {
+  const file = path.join(import.meta.dirname + pathToFile);
   const content = fs.readFileSync(file).toString();
-  db.exec(content);
+
+  return content;
 }
 
-function seedUser(): void {
-  try {
-    db.prepare<[string, string], void>(
-      "INSERT INTO users(username, password) VALUES (?, ?);",
-    ).run("Ignas", "testpwd123");
-    console.log("user inserted");
-    db.prepare<[string, string], void>(
-      "INSERT INTO users(username, password) VALUES (?, ?);",
-    ).run("Kamile", "kamile123");
-    console.log("user inserted");
-  } catch (err) {
-    console.error(err);
+function getDbVersion(): number {
+  const tableExists = db
+    .prepare(
+      "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'schema_migrations'",
+    )
+    .get();
+
+  if (!tableExists) {
+    return 0;
   }
+
+  const result = db
+    .prepare<[], Version | undefined>("SELECT version FROM schema_migrations;")
+    .get();
+
+  return result?.version ?? 0;
 }
 
-type InsertRecipeArgs = readonly [number, string, string, number];
+function updateDbVersion(currentVersion: number): number {
+  const dbVersion = db
+    .prepare<[], Version>("SELECT version FROM schema_migrations LIMIT 1;")
+    .get();
 
-function seedRecipe() {
-  try {
-    const users = db
-      .prepare<[], { id: User["id"] }>("select id from users;")
-      .all();
-    if (users === undefined) throw new Error("User select error");
+  if (dbVersion === undefined) {
+    db.prepare<number, void>(
+      "INSERT INTO schema_migrations(version) VALUES (?)",
+    ).run(currentVersion);
+  } else {
+    db.prepare(`UPDATE schema_migrations SET version = ?;`).run(currentVersion);
+  }
 
-    users.forEach((user) => {
-      db.prepare<InsertRecipeArgs, void>(
-        "INSERT INTO recipes(user_id, title, description, prep_time_seconds) VALUES (?, ?, ?, ?);",
-      ).run([user.id, "Test Recipe", "Lorem ipsum sit", 600]);
-      console.log("recipe inserted");
+  const result = db
+    .prepare<[], Version>("SELECT version FROM schema_migrations;")
+    .get();
+  if (result === undefined) {
+    throw new Error("DB version not found");
+  }
+
+  return result.version;
+}
+
+function runMigrations() {
+  let version = getDbVersion();
+
+  migrations
+    .toSorted((a, b) => a.version - b.version)
+    .forEach((migration) => {
+      if (migration.version > version) {
+        const migrate = db.transaction(() => {
+          db.exec(readMigration("/migrations" + migration.file));
+          updateDbVersion(migration.version);
+        });
+
+        migrate();
+        version = migration.version;
+      }
     });
-  } catch (err) {
-    console.error(err);
-  }
 }
 
-export function handleSeedData(skip = false) {
-  if (skip) return;
+export function initDatabase(): void {
+  try {
+    db.pragma("foreign_keys = on");
 
-  const shouldSeedUser = !Boolean(db.prepare("select * from users;").get());
+    const version = getDbVersion();
 
-  if (shouldSeedUser) {
-    seedUser();
-  }
+    if (version === 0) {
+      const init = db.transaction(() => {
+        db.exec(readMigration("/schema.sql"));
+        updateDbVersion(1);
+      });
 
-  const shouldSeedRecipe = !Boolean(db.prepare("select * from recipes;").get());
-  if (shouldSeedRecipe) {
-    seedRecipe();
+      init();
+    }
+
+    runMigrations();
+  } catch (err) {
+    console.error("Database initialization failed:", err);
+    throw err;
   }
 }
 

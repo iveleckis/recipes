@@ -2,6 +2,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  letter-spacing: 1px;
+  font-weight: 300;
 }
 
 html,
@@ -12,4 +14,50 @@ body,
 
 ul {
   list-style-type: none;
+}
+
+label {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: rgb(150, 150, 150);
+  display: block;
+}
+
+label > input,
+label > textarea {
+  margin-top: 4px;
+}
+
+input {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid rgb(220, 220, 220);
+  font-style: italic;
+  font-weight: 400;
+  padding: 4px 0;
+  width: 100%;
+}
+
+textarea {
+  background-color: rgba(0, 0, 0, 0.05);
+  border: none;
+  border-bottom: 1px solid rgb(220, 220, 220);
+  font-style: italic;
+  font-weight: 400;
+  padding: 4px 0;
+  width: 100%;
+}
+
+button {
+  background-color: transparent;
+  border: none;
+  color: rgb(150, 150, 150);
+  font-size: 12px;
+}
+
+button.primary {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid rgb(175, 76, 0);
+  color: rgb(175, 76, 0);
 }

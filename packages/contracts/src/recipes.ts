@@ -26,13 +26,23 @@ export type GetRecipeResponse = z.infer<typeof getRecipeResponseSchema>;
 
 // CREATE
 export const createRecipeRequestSchema = z.object({
-  title: z.string(),
+  title: z.string().min(1).max(999),
+  prepTimeMinutes: z.number().min(1).max(9999),
+  serves: z.number().min(1).max(999),
+  ingredients: z.array(z.string()).max(50),
+  method: z.array(z.string()).max(50),
+  note: z.string().optional(),
 });
 export type CreateRecipeRequest = z.infer<typeof createRecipeRequestSchema>;
 
 export const createRecipeResponseSchema = z.object({
   id: z.number(),
-  title: z.string(),
+  title: z.string().min(1).max(999),
+  prepTimeMinutes: z.number().min(1).max(9999),
+  serves: z.number().min(1).max(999),
+  ingredients: z.array(z.string()).max(50),
+  method: z.array(z.string()).max(50),
+  note: z.string().optional(),
 });
 export type CreateRecipeResponse = z.infer<typeof createRecipeResponseSchema>;
 

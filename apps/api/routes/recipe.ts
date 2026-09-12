@@ -76,15 +76,24 @@ router.post<{}, CreateRecipeResponse | CustomError, CreateRecipeRequest, {}>(
             Recipe["description"],
             Recipe["prep_time_seconds"],
           ],
-          Pick<Recipe, "id" | "title"> | undefined
-        >("INSERT INTO recipes(user_id, title, description, prep_time_seconds) VALUES(?, ?, ?, ?) RETURNING id, title;")
-        .get([req.user.id, body.title, "", 0]);
+          Recipe | undefined
+        >("INSERT INTO recipes(user_id, title, description, prep_time_seconds) VALUES(?, ?, ?, ?) RETURNING *;")
+        .get([req.user.id, body.title, "", body.prepTimeMinutes * 60]);
 
       if (result === undefined) {
         return res.status(500).json({ error: "Failed to create recipe" });
       }
 
-      res.status(201).json(result);
+      const responseMap: CreateRecipeResponse = {
+        id: result.id,
+        title: result.title,
+        prepTimeMinutes: result.prep_time_seconds * 60,
+        serves: 1,
+        ingredients: [],
+        method: [],
+      };
+
+      res.status(201).json(responseMap);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Something went wrong." });
