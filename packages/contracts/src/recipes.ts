@@ -27,7 +27,7 @@ export type GetRecipeResponse = z.infer<typeof getRecipeResponseSchema>;
 // CREATE
 export const createRecipeRequestSchema = z.object({
   title: z.string().min(1).max(999),
-  prepTimeMinutes: z.number().min(1).max(9999),
+  prepTimeSeconds: z.number().min(1).max(9999),
   serves: z.number().min(1).max(999),
   ingredients: z.array(z.string()).max(50),
   method: z.array(z.string()).max(50),
@@ -38,7 +38,7 @@ export type CreateRecipeRequest = z.infer<typeof createRecipeRequestSchema>;
 export const createRecipeResponseSchema = z.object({
   id: z.number(),
   title: z.string().min(1).max(999),
-  prepTimeMinutes: z.number().min(1).max(9999),
+  prepTimeSeconds: z.number().min(1).max(9999),
   serves: z.number().min(1).max(999),
   ingredients: z.array(z.string()).max(50),
   method: z.array(z.string()).max(50),
