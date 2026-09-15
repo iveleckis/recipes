@@ -15,21 +15,25 @@ const limiter = rateLimit({
   limit: 50,
 });
 
-const authRuoteLimiter = rateLimit({
+const authRouteLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 15,
 });
 
 const app: Express = express();
 
-const allowedOrigins =
+const clientUrl =
   process.env.MODE === "DEV"
-    ? [process.env.DEV_CLIENT_URL ?? ""]
-    : [process.env.CLIENT_URL ?? ""];
+    ? process.env.DEV_CLIENT_URL
+    : process.env.CLIENT_URL;
+
+if (!clientUrl) {
+  throw new Error("Client URL is not configured");
+}
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: clientUrl,
   }),
 );
 
@@ -37,10 +41,9 @@ app.set("trust proxy", 2);
 
 app.use(helmet());
 app.use(limiter);
-app.use(express.json());
 
-app.use("/auth", authRuoteLimiter, authRouter);
-app.use("/recipes", authenticateToken, recipeRouter);
+app.use("/auth", express.json({ limit: "10kb" }), authRouteLimiter, authRouter);
+app.use("/recipes", express.json(), authenticateToken, recipeRouter);
 
 async function main() {
   try {
