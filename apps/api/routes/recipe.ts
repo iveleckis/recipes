@@ -9,6 +9,7 @@ import {
   type GetRecipeResponse,
   type GetRecipeParams,
   getRecipeParamsSchema,
+  createRecipeRequestSchema,
 } from "@recipes/contracts";
 import type { Recipe } from "../database/types/recipe.ts";
 import db from "../database/index.ts";
@@ -66,25 +67,41 @@ router.get<GetRecipeParams, GetRecipeResponse | CustomError, {}, {}>(
 router.post<{}, CreateRecipeResponse | CustomError, CreateRecipeRequest, {}>(
   "/",
   (req, res) => {
-    const body = req.body;
+    const parsed = createRecipeRequestSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      console.error(parsed.error);
+      return res.status(401).json({ error: "Bad request" });
+    }
+
+    const body = parsed.data;
+
     try {
       const result = db
         .prepare<
           readonly [
             Recipe["user_id"],
             Recipe["title"],
-            Recipe["description"],
             Recipe["prep_time_seconds"],
           ],
-          Pick<Recipe, "id" | "title"> | undefined
-        >("INSERT INTO recipes(user_id, title, description, prep_time_seconds) VALUES(?, ?, ?, ?) RETURNING id, title;")
-        .get([req.user.id, body.title, "", 0]);
+          Recipe
+        >("INSERT INTO recipes(user_id, title, prep_time_seconds) VALUES(?, ?, ?) RETURNING *;")
+        .get([req.user.id, body.title, body.prepTimeMinutes * 60]);
 
       if (result === undefined) {
         return res.status(500).json({ error: "Failed to create recipe" });
       }
 
-      res.status(201).json(result);
+      const responseMap: CreateRecipeResponse = {
+        id: result.id,
+        title: result.title,
+        prepTimeMinutes: result.prep_time_seconds / 60,
+        serves: 1,
+        ingredients: [],
+        method: [],
+      };
+
+      res.status(201).json(responseMap);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Something went wrong." });
@@ -102,20 +119,13 @@ router.put("/:id", (req: Request, res: Response) => {
       .prepare<
         readonly [
           Recipe["title"],
-          Recipe["description"],
           Recipe["prep_time_seconds"],
           Recipe["user_id"],
           Recipe["id"],
         ],
         Recipe
-      >("UPDATE recipes SET title = ?, description = ?, prep_time_seconds = ? WHERE user_id = ? AND id = ? RETURNING *;")
-      .get([
-        body.title,
-        body.description,
-        body.prep_time_seconds,
-        req.user.id,
-        Number(id),
-      ]);
+      >("UPDATE recipes SET title = ?, prep_time_seconds = ? WHERE user_id = ? AND id = ? RETURNING *;")
+      .get([body.title, body.prep_time_seconds, req.user.id, Number(id)]);
 
     if (!row) {
       return res.status(404).send({ error: "Recipe not found." });
