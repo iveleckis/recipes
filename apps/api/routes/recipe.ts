@@ -9,6 +9,7 @@ import {
   type GetRecipeResponse,
   type GetRecipeParams,
   getRecipeParamsSchema,
+  createRecipeRequestSchema,
 } from "@recipes/contracts";
 import type { Recipe } from "../database/types/recipe.ts";
 import db from "../database/index.ts";
@@ -66,7 +67,15 @@ router.get<GetRecipeParams, GetRecipeResponse | CustomError, {}, {}>(
 router.post<{}, CreateRecipeResponse | CustomError, CreateRecipeRequest, {}>(
   "/",
   (req, res) => {
-    const body = req.body;
+    const parsed = createRecipeRequestSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      console.error(parsed.error);
+      return res.status(401).json({ error: "Bad request" });
+    }
+
+    const body = parsed.data;
+
     try {
       const result = db
         .prepare<
@@ -77,7 +86,7 @@ router.post<{}, CreateRecipeResponse | CustomError, CreateRecipeRequest, {}>(
           ],
           Recipe
         >("INSERT INTO recipes(user_id, title, prep_time_seconds) VALUES(?, ?, ?) RETURNING *;")
-        .get([req.user.id, body.title, body.prepTimeSeconds]);
+        .get([req.user.id, body.title, body.prepTimeMinutes * 60]);
 
       if (result === undefined) {
         return res.status(500).json({ error: "Failed to create recipe" });
@@ -86,7 +95,7 @@ router.post<{}, CreateRecipeResponse | CustomError, CreateRecipeRequest, {}>(
       const responseMap: CreateRecipeResponse = {
         id: result.id,
         title: result.title,
-        prepTimeSeconds: result.prep_time_seconds,
+        prepTimeMinutes: result.prep_time_seconds / 60,
         serves: 1,
         ingredients: [],
         method: [],
