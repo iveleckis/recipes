@@ -54,32 +54,24 @@ export default function CreateRecipeForm({ onCreate }: Props) {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-      <form
-        style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-        onSubmit={form.handleSubmit(onSubmit)}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
+    <div>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div>
           <button type="submit" disabled={isPending}>
             CANCEL
           </button>
-          <button className="primary" type="submit" disabled={isPending}>
+          <button type="submit" disabled={isPending}>
             SAVE
           </button>
         </div>
         <div>
           <input
             {...form.register("title")}
-            style={{
-              fontSize: "32px",
-            }}
             placeholder="Name of the recipe"
           />
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-          >
+        <div>
+          <div>
             <label>
               TIME (minutes)
               <input
@@ -92,15 +84,12 @@ export default function CreateRecipeForm({ onCreate }: Props) {
             <label>
               INGREDIENTS
               <textarea
-                style={{ height: "120px" }}
                 {...form.register("ingredients")}
                 placeholder="One per line"
               />
             </label>
           </div>
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-          >
+          <div>
             <label>
               SERVES
               <input
@@ -112,7 +101,6 @@ export default function CreateRecipeForm({ onCreate }: Props) {
             <label>
               METHOD
               <textarea
-                style={{ height: "120px" }}
                 {...form.register("method")}
                 placeholder="One per line"
               />
@@ -124,7 +112,6 @@ export default function CreateRecipeForm({ onCreate }: Props) {
           NOTE
           <input
             placeholder="best thing we cooked this spring"
-            style={{ display: "block" }}
             {...form.register("note")}
           />
         </label>

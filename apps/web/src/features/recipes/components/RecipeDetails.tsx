@@ -10,28 +10,11 @@ type Props = {
 function IngredientsList() {
   return (
     <>
-      <div
-        style={{
-          width: "100%",
-          borderBottom: "1px solid lightgrey",
-          display: "flex",
-        }}
-      >
+      <div>
         <p>INGREDIENTS</p>
       </div>
-      <div
-        style={{
-          padding: "16px",
-        }}
-      >
-        <ul
-          style={{
-            listStyleType: "none",
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-          }}
-        >
+      <div>
+        <ul>
           <li>asdf</li>
           <li>dff</li>
           <li>sdafsdafas</li>
@@ -44,39 +27,21 @@ function IngredientsList() {
 function MethodList() {
   return (
     <>
-      <div
-        style={{
-          width: "100%",
-          borderBottom: "1px solid lightgrey",
-          display: "flex",
-        }}
-      >
+      <div>
         <p>METHOD</p>
       </div>
-      <div
-        style={{
-          padding: "16px",
-          paddingLeft: 0,
-        }}
-      >
-        <ul
-          style={{
-            listStyleType: "none",
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-          }}
-        >
+      <div>
+        <ul>
           <li>
-            <span style={{ paddingRight: "8px" }}>1</span>
+            <span>1 </span>
             <span>asdfasf</span>
           </li>
           <li>
-            <span style={{ paddingRight: "8px" }}>2</span>
+            <span>2 </span>
             <span>yrgfbasdfasf</span>
           </li>
           <li>
-            <span style={{ paddingRight: "8px" }}>3</span>
+            <span>3 </span>
             <span>asdfgasdfasf</span>
           </li>
         </ul>
@@ -105,11 +70,11 @@ export default function RecipeDetails({ id, onRemoveRecipe }: Props) {
 
           <p>35 mins</p>
 
-          <div style={{ display: "flex", gap: "16px" }}>
-            <div style={{ flex: 1 }}>
+          <div>
+            <div>
               <IngredientsList />
             </div>
-            <div style={{ flex: 1 }}>
+            <div>
               <MethodList />
             </div>
           </div>

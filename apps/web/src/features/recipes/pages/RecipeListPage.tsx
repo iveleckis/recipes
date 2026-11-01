@@ -52,24 +52,11 @@ export default function RecipeListPage() {
 
   return (
     <>
-      <div
-        style={{
-          padding: "24px",
-          height: "100%",
-          backgroundColor: "rgb(183, 179, 163)",
-        }}
-      >
+      <div>
         <BookView
           leftPage={
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-            >
+            <div>
               <RecipeList onRecipeSelect={handleOpenRecipeDetails} />
-              <div
-                style={{
-                  borderBottom: "1px dotted lightgrey",
-                }}
-              />
               <span onClick={handleOpenCreateRecipeForm}>
                 + Write a new recipe
               </span>
