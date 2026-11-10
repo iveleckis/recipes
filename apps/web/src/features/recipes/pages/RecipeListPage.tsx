@@ -5,14 +5,12 @@ import { deleteRecipe } from "../api/deleteRecipe";
 import RecipeDetails from "../components/RecipeDetails";
 import RecipeList from "../components/RecipeList";
 import { QUERY_KEYS } from "../../../constants/queryKeys";
-import CreateRecipeForm from "../components/CreateRecipeForm";
 import BookView from "../../../components/BookView";
 
 export default function RecipeListPage() {
   const queryClient = useQueryClient();
 
   const [selectedRecipeId, setSelectedRecipeId] = useState<number | null>(null);
-  const [isCreateRecipeFormOpen, setIsCreateRecipeFormOpen] = useState(false);
 
   const { mutate } = useMutation({
     mutationFn: deleteRecipe,
@@ -41,25 +39,23 @@ export default function RecipeListPage() {
   };
 
   const handleOpenRecipeDetails = (recipeId: number) => {
-    setIsCreateRecipeFormOpen(false);
     setSelectedRecipeId(recipeId);
   };
 
-  const handleOpenCreateRecipeForm = () => {
-    setSelectedRecipeId(null);
-    setIsCreateRecipeFormOpen(true);
-  };
-
   return (
-    <>
+    <main className="recipe-workspace">
+      <header className="workspace-header">
+        <h1>Recipes</h1>
+      </header>
       <div>
         <BookView
+          isRightPageActive={selectedRecipeId !== null}
           leftPage={
             <div>
-              <RecipeList onRecipeSelect={handleOpenRecipeDetails} />
-              <span onClick={handleOpenCreateRecipeForm}>
-                + Write a new recipe
-              </span>
+              <RecipeList
+                onRecipeSelect={handleOpenRecipeDetails}
+                selectedRecipeId={selectedRecipeId}
+              />
             </div>
           }
           rightPage={
@@ -68,14 +64,15 @@ export default function RecipeListPage() {
                 <RecipeDetails
                   id={selectedRecipeId}
                   onRemoveRecipe={handleDelete}
+                  onBack={() => setSelectedRecipeId(null)}
                 />
-              ) : isCreateRecipeFormOpen ? (
-                <CreateRecipeForm onCreate={handleOpenRecipeDetails} />
-              ) : null}
+              ) : (
+                <p className="recipe-placeholder">No recipe selected.</p>
+              )}
             </>
           }
         />
       </div>
-    </>
+    </main>
   );
 }

@@ -4,9 +4,10 @@ import { getRecipes } from "../api/getRecipes";
 
 type Props = {
   onRecipeSelect: (id: number) => void;
+  selectedRecipeId: number | null;
 };
 
-export default function RecipeList({ onRecipeSelect }: Props) {
+export default function RecipeList({ onRecipeSelect, selectedRecipeId }: Props) {
   const {
     data: recipes,
     isLoading,
@@ -26,21 +27,22 @@ export default function RecipeList({ onRecipeSelect }: Props) {
       ) : recipes.length === 0 ? (
         <>No recipes found...</>
       ) : (
-        <ul>
-          <>
-            <p>
-              By time since last made - {recipes.length} entries
-            </p>
+        <>
+            <p className="recipe-count">Your recipes / {recipes.length} entries</p>
+            <ul className="recipe-list">
             {recipes.map((recipe) => (
               <li key={recipe.id}>
-                <div onClick={() => onRecipeSelect(recipe.id)}>
-                  {recipe.title}
-                </div>
-                <div>7 months</div>
+                <button
+                  className="recipe-list-item"
+                  aria-pressed={selectedRecipeId === recipe.id}
+                  onClick={() => onRecipeSelect(recipe.id)}
+                >
+                  <span>{recipe.title}</span>
+                </button>
               </li>
             ))}
-          </>
-        </ul>
+            </ul>
+        </>
       )}
     </>
   );

@@ -5,9 +5,10 @@ import { getRecipe } from "../api/getRecipe";
 type Props = {
   id: number;
   onRemoveRecipe: (id: number) => void;
+  onBack: () => void;
 };
 
-function IngredientsList() {
+function IngredientsList({ ingredients }: { ingredients: string[] }) {
   return (
     <>
       <div>
@@ -15,42 +16,33 @@ function IngredientsList() {
       </div>
       <div>
         <ul>
-          <li>asdf</li>
-          <li>dff</li>
-          <li>sdafsdafas</li>
+          {ingredients.map((ingredient, index) => (
+            <li key={index}>{ingredient}</li>
+          ))}
         </ul>
       </div>
     </>
   );
 }
 
-function MethodList() {
+function MethodList({ method }: { method: string[] }) {
   return (
     <>
       <div>
         <p>METHOD</p>
       </div>
       <div>
-        <ul>
-          <li>
-            <span>1 </span>
-            <span>asdfasf</span>
-          </li>
-          <li>
-            <span>2 </span>
-            <span>yrgfbasdfasf</span>
-          </li>
-          <li>
-            <span>3 </span>
-            <span>asdfgasdfasf</span>
-          </li>
-        </ul>
+        <ol>
+          {method.map((step, index) => (
+            <li key={index}>{step}</li>
+          ))}
+        </ol>
       </div>
     </>
   );
 }
 
-export default function RecipeDetails({ id, onRemoveRecipe }: Props) {
+export default function RecipeDetails({ id, onBack }: Props) {
   const { data, isLoading, isError } = useQuery({
     queryKey: QUERY_KEYS.recipeDetails(id),
     queryFn() {
@@ -60,26 +52,48 @@ export default function RecipeDetails({ id, onRemoveRecipe }: Props) {
 
   return (
     <>
+      <header className="recipe-title-row">
+        <button
+          className="recipe-back-button"
+          type="button"
+          onClick={onBack}
+          aria-label="Back to recipes"
+          title="Back to recipes"
+        >
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <h3>{data?.title ?? "Recipe"}</h3>
+      </header>
       {isLoading ? (
         <span>Loading...</span>
       ) : isError || data === undefined ? (
         <>Error fetching </>
       ) : (
         <>
-          <h3>{data.title}</h3>
-
-          <p>35 mins</p>
+          <p>{data.prepTimeMinutes} mins</p>
 
           <div>
             <div>
-              <IngredientsList />
+              <IngredientsList ingredients={data.ingredients} />
             </div>
             <div>
-              <MethodList />
+              <MethodList method={data.method} />
             </div>
           </div>
 
-          <button onClick={() => onRemoveRecipe(data.id)}>Remove recipe</button>
         </>
       )}
     </>

@@ -20,6 +20,9 @@ export type GetRecipeParams = z.infer<typeof getRecipeParamsSchema>;
 export const getRecipeResponseSchema = z.object({
   id: z.number(),
   title: z.string(),
+  ingredients: z.array(z.string()),
+  method: z.array(z.string()),
+  prepTimeMinutes: z.number(),
 });
 
 export type GetRecipeResponse = z.infer<typeof getRecipeResponseSchema>;

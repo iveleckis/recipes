@@ -9,6 +9,7 @@ import {
   type GetRecipeResponse,
   type GetRecipeParams,
   getRecipeParamsSchema,
+  getRecipeResponseSchema,
   createRecipeRequestSchema,
 } from "@recipes/contracts";
 import type { Recipe } from "../database/types/recipe.ts";
@@ -48,15 +49,26 @@ router.get<GetRecipeParams, GetRecipeResponse | CustomError, {}, {}>(
       const row = db
         .prepare<
           readonly [Recipe["user_id"], Recipe["id"]],
-          Pick<Recipe, "id" | "title"> | undefined
-        >("SELECT id, title FROM recipes WHERE user_id = ? AND id = ?;")
+          (Pick<Recipe, "id" | "title" | "prep_time_minutes"> & {
+            ingredients: string;
+            steps: string;
+          }) | undefined
+        >("SELECT id, title, ingredients, steps, prep_time_minutes FROM recipes WHERE user_id = ? AND id = ?;")
         .get([req.user.id, id]);
 
       if (!row) {
         return res.status(404).json({ error: "Recipe not found." });
       }
 
-      res.status(200).json(row);
+      const response = getRecipeResponseSchema.parse({
+        id: row.id,
+        title: row.title,
+        ingredients: JSON.parse(row.ingredients),
+        method: JSON.parse(row.steps),
+        prepTimeMinutes: row.prep_time_minutes,
+      });
+
+      res.status(200).json(response);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Something went wrong." });
