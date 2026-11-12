@@ -94,11 +94,11 @@ router.post<{}, CreateRecipeResponse | CustomError, CreateRecipeRequest, {}>(
           readonly [
             Recipe["user_id"],
             Recipe["title"],
-            Recipe["prep_time_seconds"],
+            Recipe["prep_time_minutes"],
           ],
           Recipe
-        >("INSERT INTO recipes(user_id, title, prep_time_seconds) VALUES(?, ?, ?) RETURNING *;")
-        .get([req.user.id, body.title, body.prepTimeMinutes * 60]);
+        >("INSERT INTO recipes(user_id, title, prep_time_minutes) VALUES(?, ?, ?) RETURNING *;")
+        .get([req.user.id, body.title, body.prepTimeMinutes]);
 
       if (result === undefined) {
         return res.status(500).json({ error: "Failed to create recipe" });
@@ -107,7 +107,7 @@ router.post<{}, CreateRecipeResponse | CustomError, CreateRecipeRequest, {}>(
       const responseMap: CreateRecipeResponse = {
         id: result.id,
         title: result.title,
-        prepTimeMinutes: result.prep_time_seconds / 60,
+        prepTimeMinutes: result.prep_time_minutes,
         serves: 1,
         ingredients: [],
         method: [],
@@ -131,13 +131,13 @@ router.put("/:id", (req: Request, res: Response) => {
       .prepare<
         readonly [
           Recipe["title"],
-          Recipe["prep_time_seconds"],
+          Recipe["prep_time_minutes"],
           Recipe["user_id"],
           Recipe["id"],
         ],
         Recipe
-      >("UPDATE recipes SET title = ?, prep_time_seconds = ? WHERE user_id = ? AND id = ? RETURNING *;")
-      .get([body.title, body.prep_time_seconds, req.user.id, Number(id)]);
+      >("UPDATE recipes SET title = ?, prep_time_minutes = ? WHERE user_id = ? AND id = ? RETURNING *;")
+      .get([body.title, body.prep_time_minutes, req.user.id, Number(id)]);
 
     if (!row) {
       return res.status(404).send({ error: "Recipe not found." });
